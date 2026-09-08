@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-"""从唯一真源生成全部取用物。
+"""从唯一真源生成全部取用物（中英双语）。
 
     source/meta_questions.yaml   ← 唯一真源，只改这里
             │
-            ├─→ dist/quickstart.md              档 A 单文件速食（粘进任意 AI）
-            ├─→ dist/staged/01..05 + profile    档 B 分段 + 持久记忆 + 报告出口
-            ├─→ .claude/skills/meta-questions/  档 C Claude Code skill
-            ├─→ dist/stage_script.md            现场 15-20 分钟讲稿骨架
-            └─→ README.md                       仓库门面
+            ├─→ dist/          中文：quickstart / staged / stage_script
+            ├─→ dist/en/       English: quickstart / staged
+            ├─→ .claude/skills/meta-questions[-en]/
+            └─→ README.md / README.en.md
 
-两条不可退让的性质：
+三条不可退让的性质：
 1. **幂等**：输出只依赖真源，不依赖构建当天的日期。否则 CI 没法用
    `git diff --exit-code` 守「dist 与真源同步」。
-2. **题号锚定 id**：显示编号由 `q7` 推出 7，不由列表位置推。真源里的
-   现场讲稿引用了 Q1/Q6/Q7/Q10，位置编号会让重排题目静默打乱台上讲的内容。
+2. **题号锚定 id**：显示编号由 `q7` 推出 7，不由列表位置推。真源里的现场讲稿
+   引用了 Q1/Q6/Q7/Q10，位置编号会让重排题目静默打乱台上讲的内容。
+3. **零硬编码文案**：所有面向读者的字句都在真源里（`ui` / `instructions` /
+   `profile` / `skill`）。build.py 里出现中文字面量，就是第二真源。
 """
 from __future__ import annotations
 
@@ -26,26 +27,53 @@ import yaml
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "source" / "meta_questions.yaml"
 DIST = ROOT / "dist"
-STAGED = DIST / "staged"
-SKILL_DIR = ROOT / ".claude" / "skills" / "meta-questions"
+SKILLS = ROOT / ".claude" / "skills"
 
 BANNER = "<!-- 生成物，勿手改。改 source/meta_questions.yaml 后跑 `python3 build.py` -->"
 REPORT_FILE = "05_report.md"
+LANGS = ("zh", "en")
 
 # 中日韩字符范围。测试从这里 import，别在两处各写一份（会不同步）。
 CJK = "一-鿿　-〿＀-￯"
 
-WANT_LABELS = {
-    "number": "数字",
-    "name": "人名",
-    "date": "时间",
-    "story": "一段具体经过",
-    "choice": "二选一",
-}
-
 
 class SourceError(ValueError):
     """真源被改坏。带上是哪一条坏了——否则 12 道题同名字段一片，没法定位。"""
+
+
+# ── 语言无关的取值 ──────────────────────────────────────────
+def tr(obj: dict, key: str, lang: str):
+    """取 `key_<lang>`，缺英文时退回中文（部署优于完美，但会被测试点名）。"""
+    return obj.get(f"{key}_{lang}") or obj[f"{key}_zh"]
+
+
+def ui(src: dict, lang: str) -> dict:
+    return src["ui"][lang]
+
+
+def qnum(q: dict) -> int:
+    """显示编号来自 id，不来自列表位置。"""
+    return int(q["id"][1:])
+
+
+def segments(src: dict) -> list[dict]:
+    return sorted(src["segments"], key=lambda s: s["n"])
+
+
+def dist_dir(lang: str) -> Path:
+    return DIST if lang == "zh" else DIST / lang
+
+
+def staged_dir(lang: str) -> Path:
+    return dist_dir(lang) / "staged"
+
+
+def skill_dir(lang: str) -> Path:
+    return SKILLS / ("meta-questions" if lang == "zh" else f"meta-questions-{lang}")
+
+
+def readme_path(lang: str) -> Path:
+    return ROOT / ("README.md" if lang == "zh" else f"README.{lang}.md")
 
 
 # ── 读取与校验 ──────────────────────────────────────────────
@@ -58,9 +86,19 @@ def load() -> dict:
 def validate(src: dict) -> None:
     """build.py 独立执行时也要校验——不能只靠 pytest，那样直接跑 build 的人裸奔。"""
     for key in ("version", "released_on", "name", "segments", "report", "probe",
-                "instructions", "profile", "skill", "theory", "stage"):
+                "instructions", "profile", "skill", "theory", "stage", "ui"):
         if key not in src:
             raise SourceError(f"真源缺顶层字段 `{key}`")
+
+    for lang in LANGS:
+        if lang not in src["ui"]:
+            raise SourceError(f"ui 块缺语言 `{lang}`")
+    if set(src["ui"]["zh"]) != set(src["ui"]["en"]):
+        diff = set(src["ui"]["zh"]) ^ set(src["ui"]["en"])
+        raise SourceError(f"ui 中英键不对齐，差异: {sorted(diff)}")
+    want_keys = set(src["ui"]["zh"]["want_labels"])
+    if want_keys != set(src["ui"]["en"]["want_labels"]):
+        raise SourceError("want_labels 中英键不对齐")
 
     nums = [s.get("n") for s in src["segments"]]
     if nums != list(range(1, len(nums) + 1)):
@@ -71,35 +109,33 @@ def validate(src: dict) -> None:
 
     seen: set[int] = set()
     for seg in src["segments"]:
-        for field in ("id", "title_zh", "subtitle_zh", "anchor", "questions"):
+        for field in ("id", "title_zh", "title_en", "subtitle_zh", "anchor", "questions"):
             if not seg.get(field):
                 raise SourceError(f"段 `{seg.get('id', '?')}` 缺字段 `{field}`")
         for q in seg["questions"]:
             qid = q.get("id", "?")
-            for field in ("id", "zh", "en", "want", "why_zh"):
+            for field in ("id", "zh", "en", "want", "why_zh", "why_en"):
                 if not q.get(field):
                     raise SourceError(f"问题 `{qid}`（段 {seg.get('id')}）缺字段 `{field}`")
             if not re.fullmatch(r"q\d+", qid):
                 raise SourceError(f"问题 id 必须形如 q1/q2…，实际是 `{qid}`")
+            if q.get("probe_zh") and not q.get("probe_en"):
+                raise SourceError(f"问题 `{qid}` 有 probe_zh 却没有 probe_en")
             n = qnum(q)
             if n in seen:
                 raise SourceError(f"问题编号 {n} 重复（id `{qid}`）")
             seen.add(n)
             for w in q["want"]:
-                if w not in WANT_LABELS:
+                if w not in want_keys:
                     raise SourceError(f"问题 `{qid}` 的 want 含未知类型 `{w}`")
 
     if seen != set(range(1, len(seen) + 1)):
         raise SourceError(f"问题编号必须是连续的 1..{len(seen)}，实际是 {sorted(seen)}")
 
-
-def qnum(q: dict) -> int:
-    """显示编号来自 id，不来自列表位置。"""
-    return int(q["id"][1:])
-
-
-def segments(src: dict) -> list[dict]:
-    return sorted(src["segments"], key=lambda s: s["n"])
+    for sec in src["report"]["sections"]:
+        for field in ("title_zh", "title_en", "form_zh", "form_en", "content_zh", "content_en"):
+            if not sec.get(field):
+                raise SourceError(f"报告第 {sec.get('n', '?')} 节缺字段 `{field}`")
 
 
 def unfold_cjk(text: str) -> str:
@@ -116,10 +152,11 @@ def file_footer(src: dict) -> str:
     )
 
 
-def report_footer(src: dict) -> str:
+def report_footer(src: dict, lang: str) -> str:
     """报告页脚的日期由 AI 当场填——写死构建日期会让 2027 年跑出来的报告印 2026。"""
-    return src["report"]["report_footer_template"].format(
-        name=src["name"], version=src["version"]
+    return src["report"]["footer_template"].format(
+        name=src["name"], version=src["version"],
+        date=ui(src, lang)["report_date_placeholder"],
     )
 
 
@@ -129,255 +166,262 @@ def write(path: Path, text: str) -> Path:
     return path
 
 
+def numbered(items) -> list[str]:
+    return [f"{i}. {s}" for i, s in enumerate(items, 1)]
+
+
 # ── 可复用片段 ──────────────────────────────────────────────
-def _probe_block(src: dict) -> str:
+def _probe_block(src: dict, lang: str) -> str:
     rounds = src["probe"]["max_rounds"]
-    lines = ["## 追问规则（你必须遵守）", ""]
-    lines += [f"{i}. {r.format(max_rounds=rounds)}"
-              for i, r in enumerate(src["probe"]["rules_zh"], 1)]
-    return "\n".join(lines)
+    rules = tr(src["probe"], "rules", lang)
+    return "\n".join([f"## {ui(src, lang)['probe_rules']}", ""]
+                     + numbered(r.format(max_rounds=rounds) for r in rules))
 
 
-def _report_block(src: dict, *, guard: bool) -> str:
-    lines = ["## 全部问完之后，输出这份报告", ""]
+def _report_block(src: dict, lang: str, *, guard: bool) -> str:
+    u = ui(src, lang)
+    lines = [f"## {u['report_heading']}", ""]
     if guard:
-        lines += [src["instructions"]["report_guard_zh"], ""]
+        lines += [tr(src["instructions"], "report_guard", lang), ""]
     for sec in src["report"]["sections"]:
         lines += [
-            f"### 第 {sec['n']} 节 · {sec['title_zh']}",
-            f"- 形式：{sec['form_zh']}",
-            f"- 内容：{sec['content_zh']}",
+            f"### {u['report_section'].format(n=sec['n'], title=tr(sec, 'title', lang))}",
+            f"- {u['form_label']}: {tr(sec, 'form', lang)}",
+            f"- {u['content_label']}: {unfold_cjk(tr(sec, 'content', lang))}",
             "",
         ]
-    lines += [f"报告页脚固定写：`{report_footer(src)}`"]
-    return "\n".join(lines)
+    return "\n".join(lines + [f"{u['footer_instruction']}: `{report_footer(src, lang)}`"])
 
 
-def _question_lines(src: dict, seg: dict) -> list[str]:
-    prefix = src["instructions"]["probe_hint_prefix_zh"]
+def _question_lines(src: dict, seg: dict, lang: str) -> list[str]:
+    u = ui(src, lang)
+    prefix = tr(src["instructions"], "probe_hint_prefix", lang)
     lines: list[str] = []
     for q in seg["questions"]:
-        wants = "／".join(WANT_LABELS[w] for w in q["want"])
+        wants = u["want_join"].join(u["want_labels"][w] for w in q["want"])
+        text = q["zh"] if lang == "zh" else q["en"]
         lines += [
-            f"**Q{qnum(q)}. {q['zh']}**",
-            "",
-            f"> *{q['why_zh']}*",
-            "",
-            f"> 需要的证据：{wants}",
-            "",
+            f"**Q{qnum(q)}. {text}**", "",
+            f"> *{unfold_cjk(tr(q, 'why', lang))}*", "",
+            f"> {u['evidence_needed']}: {wants}", "",
         ]
         if q.get("probe_zh"):
-            lines += [f"> {prefix} 追问条件：{q['probe_zh']}", ""]
+            lines += [f"> {prefix} {u['probe_condition']}: {tr(q, 'probe', lang)}", ""]
     return lines
 
 
-def _all_segments_block(src: dict) -> list[str]:
+def _all_segments_block(src: dict, lang: str) -> list[str]:
+    u = ui(src, lang)
     out: list[str] = []
     for seg in segments(src):
-        out += [f"### 第 {seg['n']} 段 · {seg['title_zh']}（{seg['subtitle_zh']}）", ""]
-        out += _question_lines(src, seg)
+        out += [f"### {u['segment_label'].format(n=seg['n'], title=tr(seg, 'title', lang), subtitle=tr(seg, 'subtitle', lang))}", ""]
+        out += _question_lines(src, seg, lang)
     return out
 
 
 # ── 档 A：单文件速食 ────────────────────────────────────────
-def build_quickstart(src: dict) -> Path:
-    ins = src["instructions"]
+def build_quickstart(src: dict, lang: str) -> Path:
+    u, ins = ui(src, lang), src["instructions"]
     out = [
         BANNER,
-        f"# 元问题 · 单文件版 v{src['version']}",
+        f"# {u['quickstart_title']} v{src['version']}",
         "",
-        f"> {src['tagline_zh']}",
+        f"> {tr(src, 'tagline', lang)}",
         "",
-        "**怎么用**：",
-        *[f"{i}. {s}" for i, s in enumerate(ins["usage_quickstart_zh"], 1)],
+        f"**{u['how_to_use']}**",
         "",
-        "---",
-        "",
-        "## 你的角色",
-        "",
-        unfold_cjk(src["premise_zh"]),
-        "",
-        ins["role_zh"],
-        "",
-        ins["start_command_zh"],
-        "",
-        _probe_block(src),
+        *numbered(tr(ins, "usage_quickstart", lang)),
         "",
         "---",
         "",
-        "## 要问的问题（按顺序，一次一个）",
+        f"## {u['your_role']}",
         "",
-        *_all_segments_block(src),
+        unfold_cjk(tr(src, "premise", lang)),
+        "",
+        tr(ins, "role", lang),
+        "",
+        tr(ins, "start_command", lang),
+        "",
+        _probe_block(src, lang),
+        "",
         "---",
         "",
-        _report_block(src, guard=True),
+        f"## {u['questions_heading']}",
+        "",
+        *_all_segments_block(src, lang),
+        "---",
+        "",
+        _report_block(src, lang, guard=True),
         "",
         "---",
         "",
         f"<sub>{file_footer(src)}</sub>",
     ]
-    return write(DIST / "quickstart.md", "\n".join(out))
+    return write(dist_dir(lang) / "quickstart.md", "\n".join(out))
 
 
 # ── 档 B：分段 + profile.md 记忆 + 报告出口 ─────────────────
-def _profile_template(src: dict) -> str:
-    prof = src["profile"]
+def _profile_template(src: dict, lang: str) -> str:
+    u, prof = ui(src, lang), src["profile"]
     out = [
         BANNER,
-        f"# profile.md — 我的元问题档案（模板 v{src['version']}）",
+        f"# {u['profile_title'].format(version='v' + src['version'])}",
         "",
-        *[f"> {line}" for line in prof["intro_zh"]],
+        *[f"> {line}" for line in tr(prof, "intro", lang)],
         "",
-        "## 基本",
-        *[f"- {f}" for f in prof["basic_fields_zh"]],
+        f"## {u['basics']}",
+        *[f"- {f}" for f in tr(prof, "basic_fields", lang)],
         "",
     ]
     # 预置各段小节标题：AI 有地方可填，才不会一路追加到页脚后面
     for seg in segments(src):
-        out += [f"## {seg['title_zh']}（待填）", ""]
-    out += ["## 变更记录", "- <你开始的日期> 建档（模板 v" + src["version"] + "）", "",
+        out += [f"## {tr(seg, 'title', lang)}{u['pending_suffix']}", ""]
+    out += [f"## {u['changelog']}",
+            u["changelog_line"].format(version="v" + src["version"]), "",
             f"<sub>{file_footer(src)}</sub>"]
     return "\n".join(out)
 
 
-def _staged_one(src: dict, seg: dict, nxt_label: str) -> Path:
-    ins, prof = src["instructions"], src["profile"]
-    usage = ins["usage_staged_first_zh"] if seg["n"] == 1 else ins["usage_staged_rest_zh"]
+def _staged_one(src: dict, seg: dict, lang: str, nxt_label: str) -> Path:
+    u, ins, prof = ui(src, lang), src["instructions"], src["profile"]
+    usage = tr(ins, "usage_staged_first" if seg["n"] == 1 else "usage_staged_rest", lang)
+    steps = list(usage) + [u["next_step"].format(nxt=nxt_label)]
     out = [
         BANNER,
-        f"# 第 {seg['n']} 段 · {seg['title_zh']} — v{src['version']}",
+        f"# {u['staged_title'].format(n=seg['n'], title=tr(seg, 'title', lang))} — v{src['version']}",
         "",
-        f"> {seg['subtitle_zh']} ｜ 理论根：{seg['anchor']}",
+        f"> {u['theory_line'].format(subtitle=tr(seg, 'subtitle', lang), anchor=seg['anchor'])}",
         "",
-        "## 怎么用",
+        f"## {u['how_to_use']}",
         "",
-        *[f"{i}. {s}" for i, s in enumerate(usage, 1)],
-        f"{len(usage) + 1}. 答完本段后，让 AI 把结论写进 `profile.md`，然后再开{nxt_label}。",
+        *numbered(steps),
         "",
-        "## 你的角色",
+        f"## {u['your_role']}",
         "",
-        ins["role_staged_zh"],
+        tr(ins, "role_staged", lang),
         "",
-        ins["start_command_zh"],
+        tr(ins, "start_command", lang),
         "",
-        _probe_block(src),
+        _probe_block(src, lang),
         "",
         "---",
         "",
-        "## 本段的问题",
+        f"## {u['section_questions']}",
         "",
-        *_question_lines(src, seg),
+        *_question_lines(src, seg, lang),
         "---",
         "",
-        "## 本段结束后，写进 profile.md",
+        f"## {u['write_to_profile']}",
         "",
-        prof["append_instruction_zh"],
+        tr(prof, "append_instruction", lang),
         "",
         "```markdown",
-        f"## {seg['title_zh']}",
-        *prof["section_body_zh"],
+        f"## {tr(seg, 'title', lang)}",
+        *tr(prof, "section_body", lang),
         "```",
         "",
         f"<sub>{file_footer(src)}</sub>",
     ]
-    return write(STAGED / f"{seg['n']:02d}_{seg['id']}.md", "\n".join(out))
+    return write(staged_dir(lang) / f"{seg['n']:02d}_{seg['id']}.md", "\n".join(out))
 
 
-def _staged_report(src: dict) -> Path:
+def _staged_report(src: dict, lang: str) -> Path:
     """档 B 的终点。没有它，认真做完四段的人走到最后一步没有文件可开。"""
+    u = ui(src, lang)
     out = [
         BANNER,
-        f"# 最后一步 · 生成报告 — v{src['version']}",
+        f"# {u['report_step_title']} — v{src['version']}",
         "",
-        "> 四段都答完了。这一步把 `profile.md` 变成一份可以拿去做决定的报告。",
+        f"> {u['report_step_intro']}",
         "",
-        "## 怎么用",
+        f"## {u['how_to_use']}",
         "",
-        "1. 开一个新对话。",
-        "2. 先把你的 `profile.md` 全文粘给 AI。",
-        "3. 再把本文件粘给 AI。",
-        "4. 把它输出的内容存成 `report.md`。",
+        *numbered(u["report_step_usage"]),
         "",
-        "## 你的角色",
+        f"## {u['your_role']}",
         "",
-        "你拿到的 `profile.md` 是这个人四段问答的全部证据。只用里面有的东西，"
-        "不要补充、不要美化、不要替他编他没说过的资源和人。",
-        "标着「证据不足」的项，在报告里如实写「证据不足」。",
+        unfold_cjk(u["report_step_role"]),
         "",
         "---",
         "",
-        _report_block(src, guard=False),
+        _report_block(src, lang, guard=False),
         "",
         f"<sub>{file_footer(src)}</sub>",
     ]
-    return write(STAGED / REPORT_FILE, "\n".join(out))
+    return write(staged_dir(lang) / REPORT_FILE, "\n".join(out))
 
 
-def build_staged(src: dict) -> list[Path]:
+def build_staged(src: dict, lang: str) -> list[Path]:
     # 先清空：否则改了段号会留下旧文件，用户拿到两份重复的同一段
-    if STAGED.exists():
-        shutil.rmtree(STAGED)
-    segs = segments(src)
+    d = staged_dir(lang)
+    if d.exists():
+        shutil.rmtree(d)
+    u, segs = ui(src, lang), segments(src)
     written = []
     for i, seg in enumerate(segs):
         if i + 1 < len(segs):
             n2 = segs[i + 1]
-            nxt = f"第 {n2['n']} 段（`{n2['n']:02d}_{n2['id']}.md`）"
+            nxt = u["next_segment"].format(n=n2["n"], file=f"{n2['n']:02d}_{n2['id']}.md")
         else:
-            nxt = f"最后一步生成报告（`{REPORT_FILE}`）"
-        written.append(_staged_one(src, seg, nxt))
-    written.append(_staged_report(src))
-    written.append(write(STAGED / "profile.template.md", _profile_template(src)))
+            nxt = u["next_report"].format(file=REPORT_FILE)
+        written.append(_staged_one(src, seg, lang, nxt))
+    written.append(_staged_report(src, lang))
+    written.append(write(d / "profile.template.md", _profile_template(src, lang)))
     return written
 
 
 # ── 档 C：Claude Code skill ────────────────────────────────
-def build_skill(src: dict) -> Path:
+def build_skill(src: dict, lang: str) -> Path:
+    u = ui(src, lang)
     qcount = sum(len(s["questions"]) for s in src["segments"])
-    desc = src["skill"]["description_template_zh"].format(qcount=qcount)
+    desc = tr(src["skill"], "description_template", lang).format(qcount=qcount)
+    # frontmatter 必须用 yaml 序列化：英文 description 里的 "Triggers:" 会让
+    # 手拼的 `description: ...` 直接解析失败（中文版用全角冒号所以躲过了）
+    front = yaml.safe_dump(
+        {"name": skill_dir(lang).name, "description": desc, "version": src["version"]},
+        allow_unicode=True, sort_keys=False, width=10 ** 6,
+    ).rstrip()
     out = [
         "---",
-        "name: meta-questions",
-        f"description: {desc}",
-        f"version: {src['version']}",
+        front,
         "---",
         "",
         BANNER,
-        f"# 元问题 · Claude Code skill v{src['version']}",
+        f"# {u['skill_title']} v{src['version']}",
         "",
-        unfold_cjk(src["premise_zh"]),
+        unfold_cjk(tr(src, "premise", lang)),
         "",
-        "## 执行步骤",
+        f"## {u['execution_steps']}",
         "",
-        *[f"{i}. {s}" for i, s in enumerate(src["skill"]["steps_zh"], 1)],
+        *numbered(tr(src["skill"], "steps", lang)),
         "",
-        src["instructions"]["start_command_zh"],
+        tr(src["instructions"], "start_command", lang),
         "",
-        _probe_block(src),
+        _probe_block(src, lang),
         "",
-        "## 问题清单",
+        f"## {u['questions_heading']}",
         "",
-        *_all_segments_block(src),
+        *_all_segments_block(src, lang),
         "---",
         "",
-        _report_block(src, guard=True),
+        _report_block(src, lang, guard=True),
         "",
         "---",
         "",
-        "## profile.md 模板",
+        f"## {u['profile_template_heading']}",
         "",
         "```markdown",
-        _profile_template(src).replace(BANNER + "\n", ""),
+        _profile_template(src, lang).replace(BANNER + "\n", ""),
         "```",
         "",
         f"<sub>{file_footer(src)}</sub>",
     ]
-    return write(SKILL_DIR / "SKILL.md", "\n".join(out))
+    return write(skill_dir(lang) / "SKILL.md", "\n".join(out))
 
 
-# ── 现场讲稿骨架 ───────────────────────────────────────────
+# ── 现场讲稿骨架（只出中文，它是给 Sam 台上用的）──────────
 def build_stage_script(src: dict) -> Path:
-    st = src["stage"]
+    st, u = src["stage"], ui(src, "zh")
     by_num = {qnum(q): q for s in src["segments"] for q in s["questions"]}
     cited = sorted({int(m) for m in re.findall(r"Q(\d+)", " ".join(st["plan_zh"]))})
     out = [
@@ -386,7 +430,7 @@ def build_stage_script(src: dict) -> Path:
         "",
         "## 流程",
         "",
-        *[f"{i}. {s}" for i, s in enumerate(st["plan_zh"], 1)],
+        *numbered(st["plan_zh"]),
         "",
         f"**互动**：{st['interaction_zh']}",
         "",
@@ -395,34 +439,21 @@ def build_stage_script(src: dict) -> Path:
     ]
     for n in cited:
         q = by_num[n]
-        out += [f"**Q{n}.** {q['zh']}", "", f"> *{q['why_zh']}*", ""]
-    out += [f"<sub>{file_footer(src)}</sub>"]
-    return write(DIST / "stage_script.md", "\n".join(out))
+        out += [f"**Q{n}.** {q['zh']}", "", f"> *{unfold_cjk(q['why_zh'])}*", ""]
+    return write(DIST / "stage_script.md", "\n".join(out + [f"<sub>{file_footer(src)}</sub>"]))
 
 
 # ── README ─────────────────────────────────────────────────
-def build_readme(src: dict) -> Path:
-    qcount = sum(len(s["questions"]) for s in src["segments"])
-    secs = src["report"]["sections"]
-    theory_rows = "\n".join(
-        f"| {t['dim_zh']} | {t['theory']} | {t['who']} | [链接]({t['url']}) |" for t in src["theory"]
-    )
-    seg_rows = "\n".join(
-        f"| {s['n']} | {s['title_zh']} / {s['title_en']} | {s['subtitle_zh']} | "
-        f"{len(s['questions'])} | {s['anchor']} |"
-        for s in segments(src)
-    )
-    # 章节名从真源现算，不硬编码——否则改了真源标题，README 会静默说谎
-    sec_names = "、".join(s["title_zh"] for s in secs)
-    out = f"""{BANNER}
-# {src['name']} · 元问题
+README_ZH = """{banner}
+# {name} · 元问题
 
-> {src['tagline_zh']}
-> *{src['tagline_en']}*
+> {tagline_zh}
+> *{tagline_en}*
 
-**v{src['version']}** ｜ <!--COUNT:questions-->{qcount}<!--/COUNT--> 个问题 · {len(src['segments'])} 段 · 三档取用
+**v{version}** ｜ <!--COUNT:questions-->{qcount}<!--/COUNT--> 个问题 · {nseg} 段 · 三档取用
+｜ [English](README.en.md)
 
-{unfold_cjk(src['premise_zh'])}
+{premise}
 
 ---
 
@@ -451,16 +482,15 @@ def build_readme(src: dict) -> Path:
 
 ### 最快的用法
 
-```bash
-git clone <this repo> && cd {src['name']}
-```
 复制 [`dist/quickstart.md`](dist/quickstart.md) 全文 → 粘进 ChatGPT / Claude / Coze / 豆包 → 发送 → 老实回答。
+
+先看看跑完长什么样：[`examples/sample_report.md`](examples/sample_report.md)。
 
 ## 你会拿到什么
 
-一份 {len(secs)} 节的报告：{sec_names}。
+一份 {nsec} 节的报告：{sec_names}。
 
-最后一节叫**「{secs[-1]['title_zh']}」**——这是整套东西存在的理由。
+最后一节叫**「{last_sec}」**——这是整套东西存在的理由。
 一个好的元问题，判据不是 AI 答得多漂亮，是你答完之后**自己冒出了新问题**。
 
 ## 理论根
@@ -477,20 +507,16 @@ git clone <this repo> && cd {src['name']}
 
 ```bash
 pip install -r requirements.txt
-
-# 改完真源后重生成
-python3 build.py
-
-# 跑测试
+python3 build.py            # 改完真源后重生成
 python3 -m pytest tests/ -q
 ```
 
-`dist/`、`README.md`、`.claude/skills/` 全是生成物，**手改会被下次 build 抹掉**，
+`dist/`、`README*.md`、`.claude/skills/` 全是生成物，**手改会被下次 build 抹掉**，
 CI 也会因为 `git diff` 不干净而失败。
 
 ## 一个提醒
 
-你复制走的是**快照**。每个生成物页脚都印着版本号（当前 `v{src['version']}`），
+你复制走的是**快照**。每个生成物页脚都印着版本号（当前 `v{version}`），
 报告页脚也会印。哪天报告出得不对，先看版本号——那是唯一能归因的东西。
 
 ## License
@@ -499,20 +525,129 @@ MIT
 
 ---
 
-<sub>{file_footer(src)}</sub>
+<sub>{footer}</sub>
 """
-    return write(ROOT / "README.md", out)
+
+README_EN = """{banner}
+# {name}
+
+> {tagline_en}
+
+**v{version}** ｜ <!--COUNT:questions-->{qcount}<!--/COUNT--> questions · {nseg} sections · three ways to use it
+｜ [中文](README.md)
+
+{premise}
+
+---
+
+## Why these questions
+
+Most people ask AI to "do X for me". The bottleneck was never prompting skill.
+It is that **you never said what you already have**. The model does not know your
+edge, the three years of data you accumulated, or the one person who can open a
+door for you — so all it can give back is correct, useless advice.
+
+This set produces no answers. It produces **an inventory of your own cards**.
+Once you have that, what to ask AI surfaces on its own.
+
+## Four sections
+
+| # | Section | Focus | Questions | Grounded in |
+|---|---|---|---|---|
+{seg_rows}
+
+## Three ways to use it
+
+| Tier | Files | For whom | Remembers you |
+|---|---|---|---|
+| A Single file | [`dist/en/quickstart.md`](dist/en/quickstart.md) | Everyone. Paste into any AI and go | ❌ |
+| B Sectioned + memory | [`dist/en/staged/`](dist/en/staged/) | People doing this properly. `profile.md` stays on your machine | ✅ |
+| C Claude Code skill | [`.claude/skills/meta-questions-en/`](.claude/skills/meta-questions-en/) | Claude Code users. Reads and writes files, can search the web | ✅ |
+
+### Fastest path
+
+Copy all of [`dist/en/quickstart.md`](dist/en/quickstart.md) → paste into ChatGPT / Claude / any chat → send → answer honestly.
+
+## What you get
+
+A {nsec}-section report: {sec_names}.
+
+The last section is **"{last_sec}"** — and that is the whole point.
+A good meta-question is not judged by how well the AI answered.
+It is judged by whether **you walked away with new questions of your own**.
+
+## Where this comes from
+
+These three dimensions are not invented.
+
+| Dimension | Theory | Source | Link |
+|---|---|---|---|
+{theory_rows}
+
+## Changing it
+
+There is exactly one source of truth: [`source/meta_questions.yaml`](source/meta_questions.yaml).
+
+```bash
+pip install -r requirements.txt
+python3 build.py            # regenerate after editing the source
+python3 -m pytest tests/ -q
+```
+
+`dist/`, `README*.md` and `.claude/skills/` are generated. **Hand edits get wiped
+by the next build**, and CI fails on a dirty `git diff`.
+
+## One warning
+
+What you copy is a **snapshot**. Every generated file carries a version in its
+footer (currently `v{version}`), and so does every report. When a report comes out
+wrong, check the version first — it is the only thing that lets you trace it.
+
+## License
+
+MIT
+
+---
+
+<sub>{footer}</sub>
+"""
+
+
+def build_readme(src: dict, lang: str) -> Path:
+    secs = src["report"]["sections"]
+    tmpl = README_ZH if lang == "zh" else README_EN
+    theory_rows = "\n".join(
+        f"| {tr(t, 'dim', lang)} | {t['theory']} | {t['who']} | [link]({t['url']}) |"
+        for t in src["theory"]
+    )
+    seg_rows = "\n".join(
+        f"| {s['n']} | {tr(s, 'title', lang)} | {tr(s, 'subtitle', lang)} | "
+        f"{len(s['questions'])} | {s['anchor']} |"
+        for s in segments(src)
+    )
+    joiner = "、" if lang == "zh" else ", "
+    return write(readme_path(lang), tmpl.format(
+        banner=BANNER, name=src["name"], version=src["version"],
+        tagline_zh=src["tagline_zh"], tagline_en=src["tagline_en"],
+        qcount=sum(len(s["questions"]) for s in src["segments"]),
+        nseg=len(src["segments"]), nsec=len(secs),
+        premise=unfold_cjk(tr(src, "premise", lang)),
+        seg_rows=seg_rows, theory_rows=theory_rows,
+        sec_names=joiner.join(tr(s, "title", lang) for s in secs),
+        last_sec=tr(secs[-1], "title", lang),
+        footer=file_footer(src),
+    ))
 
 
 def main() -> None:
     src = load()
-    made = [
-        build_quickstart(src),
-        *build_staged(src),
-        build_skill(src),
-        build_stage_script(src),
-        build_readme(src),
-    ]
+    made: list[Path] = []
+    for lang in LANGS:
+        made.append(build_quickstart(src, lang))
+        made += build_staged(src, lang)
+        made.append(build_skill(src, lang))
+        made.append(build_readme(src, lang))
+    made.append(build_stage_script(src))
     print(f"built {src['name']} v{src['version']} ({src['released_on']}) → {len(made)} files")
     for p in made:
         print(f"  {p.relative_to(ROOT)}")

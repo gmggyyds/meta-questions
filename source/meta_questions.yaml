@@ -84,16 +84,22 @@ segments:
         en: "In the past three years, was there something that would have cost someone else 3x the time or money, but you pulled off? Give the actual timeline, the actual amount, the actual outcome."
         want: ["number", "date"]
         why_zh: "优势的定义是相对成本，不是自我感觉。没有数字的优势不是优势。"
+        why_en: >-
+          An edge is defined by relative cost, not by how you feel about yourself. An edge without a number is not an edge.
       - id: q2
         zh: "你身上有没有一个别人觉得「你怎么会这个」的技能或经历？它当初是怎么来的？"
         en: "Do you have a skill or experience that makes people say 'wait, how do you know that?' Where did it come from?"
         want: ["story"]
         why_zh: "稀缺性往往长在履历的缝隙里，不在主线上。"
+        why_en: >-
+          Scarcity usually grows in the gaps of a CV, not on its main line.
       - id: q3
         zh: "有没有一类问题，大家习惯性来找你问？最近一次是谁、问的什么？"
         en: "Is there a kind of question people habitually bring to you? Who came last, and what did they ask?"
         want: ["name"]
         why_zh: "别人的求助路径，是你优势最诚实的外部证据。"
+        why_en: >-
+          Where people go for help is the most honest external evidence of your edge.
 
   - id: what_i_hold
     n: 2
@@ -108,16 +114,22 @@ segments:
         en: "List 3 things you have already paid for — in money or in time (data, inventory, content, accounts, supplier relationships, code, cash flow). Attach a number to each."
         want: ["number"]
         why_zh: "沉没成本里藏着存量资产。先盘出来，才谈得上用。"
+        why_en: >-
+          Sunk cost hides standing assets. You cannot deploy what you have never counted.
       - id: q5
         zh: "这 3 样里，哪一样是别人花钱也短期买不到的？为什么买不到？"
         en: "Which of those three could someone NOT buy quickly, even with money? Why not?"
         want: ["story"]
         why_zh: "VRIO 的 Rare + Inimitable 两条，合成这一问。"
+        why_en: >-
+          VRIO's Rare and Inimitable, folded into one question.
       - id: q6
         zh: "这 3 样里，哪一样现在基本躺着没用？躺了多久？为什么没用起来？"
         en: "Which of the three is currently sitting idle? For how long? Why has it not been put to work?"
         want: ["number", "date"]
         why_zh: "Barney 后补的 Organized 那一条。大多数人不是没资源，是资源躺着。"
+        why_en: >-
+          Barney added Organized later for a reason. Most people are not short of resources; their resources are idle.
 
   - id: whom_i_know
     n: 3
@@ -132,19 +144,28 @@ segments:
         en: "Who can open a door you cannot knock on yourself? Name the door, specifically."
         want: ["name"]
         why_zh: "关系的价值等于它通向的那扇门，不等于交情深浅。"
+        why_en: >-
+          A relationship is worth exactly the door it opens, not how close you feel.
         probe_zh: "若用户只给出最熟的人 → 追问：想想那些你几个月才见一次的人——弱关系才是桥。"
+        probe_en: "If they name only their closest contacts, probe: think about the people you see a few times a year — weak ties are the bridges."
       - id: q8
         zh: "谁能在 24 小时内给你一个诚实的「这东西行不行」的判断？他为什么会诚实？"
         en: "Who would give you an honest 'this will not work' within 24 hours? What makes them honest with you?"
         want: ["name"]
         why_zh: "验证速度是被低估的资源。找不出这个人，你的迭代周期就是以月计的。"
+        why_en: >-
+          Speed of validation is an underrated asset. Without this person your iteration cycle is measured in months.
         probe_zh: "若用户答不出这个人 → 追问：那你上一次做错的决定，是多久之后才发现的？"
+        probe_en: "If they cannot name this person, probe: how long did it take you to notice your last bad decision?"
       - id: q9
         zh: "谁手上有流量或名单，而且他有理由帮你分发？他的理由是什么？（「关系好」不算理由）"
         en: "Who holds an audience or a list, and has a REASON to distribute for you? State the reason. ('We're friends' is not a reason.)"
         want: ["name", "story"]
         why_zh: "可持续的分发建立在对方的利益上，不建立在人情上。"
+        why_en: >-
+          Durable distribution rests on their interest, not on goodwill.
         probe_zh: "若用户给的理由是「关系好」→ 打回：那不是理由。他从中得到什么？"
+        probe_en: "If the reason given is 'we are friends', push back: that is not a reason. What do they get out of it?"
 
   - id: leverage
     n: 4
@@ -159,17 +180,24 @@ segments:
         en: "The Swap Test: remove AI entirely from what you are doing. Do you slow down, or does the whole model collapse? Pick one."
         want: ["choice"]
         why_zh: "变慢 = AI-Enabled，垮掉 = AI-Native。不给中间选项，是这道题的全部意义。"
+        why_en: >-
+          Slow down = AI-Enabled. Collapse = AI-Native. Refusing a middle option is the entire point of this question.
         probe_zh: "若用户答「变慢」→ 追问：那你现在是 AI-Enabled，不是 AI-Native。你接受这个结论吗？"
+        probe_en: "If they answer 'slow down', probe: then you are AI-Enabled, not AI-Native. Do you accept that?"
       - id: q11
         zh: "如果 AI 明天免费、无限、且不会出错，你现在做的这件事应该长什么样？它会不会根本不该是现在这个形态？"
         en: "If AI were free, infinite and never wrong tomorrow — what should this thing look like? Should it even exist in its current shape?"
         want: ["story"]
         why_zh: "反锚定提问。作用不是要答案，是打断「在现有业务上加 AI」的默认路径。"
+        why_en: >-
+          A de-anchoring question. The point is not the answer — it is to interrupt the default path of bolting AI onto what already exists.
       - id: q12
         zh: "你现在缺的是哪一种杠杆——劳动力、资本、代码、还是媒体？你过去为什么没拿到它？AI 能不能绕过那个原因？"
         en: "Which leverage are you missing — labour, capital, code, or media? Why did you not get it before? Can AI route around that reason?"
         want: ["choice", "story"]
         why_zh: "把「我要用 AI」翻译成「我要用 AI 拿到哪一种杠杆」，这是全套里最关键的一次翻译。"
+        why_en: >-
+          Translating 'I want to use AI' into 'I want AI to get me which leverage'. This is the most important translation in the set.
 
 # ── 追问器规则 ───────────────────────────────────────────────
 probe:
@@ -192,36 +220,67 @@ report:
       title_zh: "你的画像"
       form_zh: "一句话 + 三维标签"
       content_zh: "用一句话说清这个人是谁。然后给三个标签：优势 / 存量 / 关系。"
+      title_en: "Who you are"
+      form_en: "One sentence + three tags"
+      content_en: >-
+        Say who this person is in one sentence. Then three tags: edge / assets / network.
     - n: 2
       title_zh: "你的不公平优势"
       form_zh: "VRIO 四格，逐格打勾或打叉"
       content_zh: "把 Q1-Q6 的证据填进「有价值／稀缺／难模仿／组织能用」四格。第四格「组织能用」的证据来自 Q6。任何一格打叉，都要写清楚为什么。"
+      title_en: "Your unfair advantage"
+      form_en: "VRIO, four cells, each ticked or crossed"
+      content_en: >-
+        Fill the evidence from Q1-Q6 into Valuable / Rare / Inimitable / Organized. The fourth cell draws on Q6. Any cross must come with a reason.
     - n: 3
       title_zh: "躺着的资源"
       form_zh: "大数字卡片"
       content_zh: "「你有 X，躺了 Y 个月。」直接引用 Q6 的原话作为证据。Y 拿不到就写「躺了多久他自己也说不清」——那本身就是证据，不要估。这是全篇最应该让人不舒服的一节。"
+      title_en: "What is sitting idle"
+      form_en: "One large-number card"
+      content_en: >-
+        'You have X. It has been idle for Y months.' Quote Q6 verbatim as the evidence. If Y never came, write 'he cannot say how long either' — that is itself evidence. Do not estimate. This is the section that should make him most uncomfortable.
     - n: 4
       title_zh: "你的杠杆缺口"
       form_zh: "四杠杆雷达（劳动力 / 资本 / 代码 / 媒体）"
       content_zh: "标出他现在有哪几种、缺哪几种，并写明「过去拿不到的原因」是否已被 AI 改变。"
+      title_en: "Your leverage gap"
+      form_en: "Four-leverage radar (labour / capital / code / media)"
+      content_en: >-
+        Mark which he has and which he lacks, and state whether the reason he could not get it before has been changed by AI.
     - n: 5
       title_zh: "AI Native 判定"
       form_zh: "Swap Test 结论 + 左右对比卡"
       content_zh: "先给判定（AI-Enabled / AI-Native）。然后左边写「提效方案」（在现有形态上加 AI），右边写「重做方案」（按 Q11 的答案重新设计形态）。明确推荐其中一个，并说明代价。"
+      title_en: "AI-Native verdict"
+      form_en: "Swap Test verdict + side-by-side cards"
+      content_en: >-
+        Give the verdict first (AI-Enabled / AI-Native). Then on the left an efficiency plan (add AI to the current shape), on the right a rebuild plan (redesign the shape per his Q11 answer). Recommend one explicitly and state its cost.
     - n: 6
       title_zh: "下周就能开始的三个动作"
       form_zh: "三张行动卡"
       content_zh: "每张卡必须写清：用他的哪一样资源／找他认识的哪一个人／多久能看到第一个结果。不许出现他没提到过的资源或人；时间他没给过就写「他没说」，不要估。"
+      title_en: "Three things he can start next week"
+      form_en: "Three action cards"
+      content_en: >-
+        Each card must name which of his assets it uses, which person he already knows, and when the first result shows. Never introduce a resource or person he did not mention; if he never gave a timeframe, write 'he did not say' rather than estimating.
     - n: 7
       title_zh: "海外对标"
       form_zh: "案例卡，每条必带 URL"
-      content_zh: "先自我判断：你这次对话有没有联网检索能力？没有 → 整节只写「未找到（本次对话无联网，请换一个能联网的 AI 重跑第 7 节）」，一个公司名都不要给。有 → 找 2-3 个海外公司或开源项目，说明它们跟他的处境哪里像、可以借走什么，每条必须给 URL；检索不到就写「未找到」。禁止凭记忆产出公司名、URL、融资额或数据。"
+      content_zh: "先自我判断：你这次对话有没有联网检索能力？没有 → 整节只写「未找到（本次对话无联网，请换一个能联网的 AI 重跑第 7 节）」，一个公司名都不要给。有 → 找 2-3 个海外公司或开源项目，说明它们跟他的处境哪里像、可以借走什么，每条必须**把完整网址原样写出来**（形如 https://example.com/page），不要只写「官网链接」这样的链接文字——用户会把报告存成纯文本，藏在链接里的网址会丢。检索不到就写「未找到」。禁止凭记忆产出公司名、URL、融资额或数据。"
+      title_en: "Comparable cases abroad"
+      form_en: "Case cards, every one carrying a URL"
+      content_en: >-
+        First check yourself: does this conversation have web search? If not, write only 'Not found (no web access in this session — rerun section 7 in an AI that can search)' and name no companies at all. If yes, find 2-3 companies or open-source projects, say where their situation resembles his and what he can borrow, each with the **full URL written out in plain text** (like https://example.com/page) — never just link text such as 'official site', because the reader saves this report as plain text and a hidden href is lost. Write 'not found' when the search comes up empty. Never produce a company name, URL, funding figure or datapoint from memory.
     - n: 8
       title_zh: "你还没回答的问题"
       form_zh: "三个反问"
       content_zh: "给他三个「他该自己问自己」的问题。这一节是元问题的终点：一个好的元问题，判据不是 AI 答得多漂亮，是他答完之后自己冒出了新问题。"
+      title_en: "The questions you have not answered yet"
+      form_en: "Three questions back at him"
+      content_en: >-
+        Give him three questions he should be asking himself. This section is the point of the whole exercise: a good meta-question is not judged by how well the AI answered, but by whether he walked away with new questions of his own.
   footer_template: "generated by {name} v{version} · {date}"       # 文件页脚：构建日期
-  report_footer_template: "generated by {name} v{version} · <在这里填今天的日期>"  # 报告页脚：日期由 AI 当场填
 
 # ── 台上用（现场 15-20 分钟）─────────────────────────────────
 stage:
@@ -253,6 +312,20 @@ instructions:
   usage_staged_rest_zh:
     - "先把你的 `profile.md` 粘给 AI，说「这是我，我们继续」。"
     - "再把本文件粘给 AI。"
+  role_en: "You are an interviewer whose only job is to gather evidence. Ask me the questions below in order, one at a time. Until every question is answered, give no advice, write no summary, and pay me no compliments."
+  role_staged_en: "You are an interviewer whose only job is to gather evidence. Ask one question at a time and wait for my answer. Until this section is finished, give no advice, no summary, no compliments."
+  start_command_en: "**Your output this turn must be the first question and nothing else. Do not restate the questions, do not list them, do not explain your plan, do not greet me.**"
+  report_guard_en: "**The template below is for the very end. Until the final question has been answered, output none of this section — not even its heading.**"
+  probe_hint_prefix_en: "[for your judgement only, do not read this aloud]"
+  usage_quickstart_en:
+    - "Copy this entire file and paste it into ChatGPT / Claude / Coze / any AI chat, then send."
+    - "It will start asking you one question at a time. Answer honestly and specifically — the report is only as good as your answers."
+  usage_staged_first_en:
+    - "This is section one, so you do not have a `profile.md` yet. Copy `profile.template.md` and save it locally."
+    - "Paste this file into the AI."
+  usage_staged_rest_en:
+    - "Paste your `profile.md` into the AI first and say \"this is me, let's continue\"."
+    - "Then paste this file."
 
 # ── profile.md 结构（真源，档 B 与档 C 共用）──────────────────
 profile:
@@ -268,6 +341,17 @@ profile:
     - "- 结论：<一句话>"
     - "- 证据：<我给出的具体数字／名字／时间，原样抄录，不要改写>"
     - "- 证据不足项：<追问到上限仍没拿到的，列出来>"
+  intro_en:
+    - "This file lives on your own machine. It is never uploaded anywhere."
+    - "Next time, open a new conversation, paste it in and say \"this is me, let's continue\" — the AI picks up where you left off."
+  basic_fields_en:
+    - "What I am working on:"
+    - "When I started it:"
+  append_instruction_en: "Find the `## <section title>` heading and fill your conclusion in there — do not append to the end of the file."
+  section_body_en:
+    - "- Conclusion: <one sentence>"
+    - "- Evidence: <the specific numbers / names / dates I gave, copied verbatim, not paraphrased>"
+    - "- Insufficient evidence: <anything still missing after the probe limit>"
 
 # ── Claude Code skill 元数据（原先硬编码在 build.py）───────────
 skill:
@@ -277,3 +361,92 @@ skill:
     - "按四段顺序提问，**一次一个**。每段结束把结论填进 `profile.md` 对应小节。"
     - "四段问完 → 按报告模板生成 `report.md`。"
     - "第 7 节「海外对标」需要联网：**每条必须带 URL**，检索不到就写「未找到」。禁止凭记忆产出公司名、URL 或数据。"
+  description_template_en: "Runs {qcount} meta-questions to map a person's edge, assets and network, then produces an AI-Native direction report. Triggers: meta questions / what do I actually have / how should I use AI / AI-Native diagnosis."
+  steps_en:
+    - "Check the current directory for `profile.md`. If it exists, read it and confirm with the user: \"here is what I remember about you — right?\" If not, create one from the template at the end of this file."
+    - "Ask the four sections in order, **one question at a time**. After each section, write the conclusion into the matching heading in `profile.md`."
+    - "All four done → produce `report.md` from the report template."
+    - "Section 7 (comparable cases abroad) needs web access: **every case must carry a URL**; write \"not found\" when the search comes up empty. Never produce a company name, URL or datapoint from memory."
+
+# ── 生成物的 UI 文案（build.py 不许硬编码任何一句）──────────────
+ui:
+  zh:
+    quickstart_title: "元问题 · 单文件版"
+    staged_title: "第 {n} 段 · {title}"
+    report_step_title: "最后一步 · 生成报告"
+    skill_title: "元问题 · Claude Code skill"
+    profile_title: "profile.md — 我的元问题档案（模板 {version}）"
+    how_to_use: "怎么用"
+    your_role: "你的角色"
+    probe_rules: "追问规则（你必须遵守）"
+    questions_heading: "要问的问题（按顺序，一次一个）"
+    section_questions: "本段的问题"
+    segment_label: "第 {n} 段 · {title}（{subtitle}）"
+    theory_line: "{subtitle} ｜ 理论根：{anchor}"
+    evidence_needed: "需要的证据"
+    probe_condition: "追问条件"
+    report_heading: "全部问完之后，输出这份报告"
+    report_section: "第 {n} 节 · {title}"
+    form_label: "形式"
+    content_label: "内容"
+    footer_instruction: "报告页脚固定写"
+    write_to_profile: "本段结束后，写进 profile.md"
+    next_step: "答完本段后，让 AI 把结论写进 `profile.md`，然后再开{nxt}"
+    next_segment: "第 {n} 段（`{file}`）"
+    next_report: "最后一步生成报告（`{file}`）"
+    basics: "基本"
+    changelog: "变更记录"
+    changelog_line: "- <你开始的日期> 建档（模板 {version}）"
+    pending_suffix: "（待填）"
+    execution_steps: "执行步骤"
+    profile_template_heading: "profile.md 模板"
+    report_step_intro: "四段都答完了。这一步把 `profile.md` 变成一份可以拿去做决定的报告。"
+    report_step_usage:
+      - "开一个新对话。"
+      - "先把你的 `profile.md` 全文粘给 AI。"
+      - "再把本文件粘给 AI。"
+      - "把它输出的内容存成 `report.md`。"
+    report_step_role: "你拿到的 `profile.md` 是这个人四段问答的全部证据。只用里面有的东西，不要补充、不要美化、不要替他编他没说过的资源和人。标着「证据不足」的项，在报告里如实写「证据不足」。"
+    want_labels: {number: "数字", name: "人名", date: "时间", story: "一段具体经过", choice: "二选一"}
+    want_join: "／"
+    report_date_placeholder: "<在这里填今天的日期>"
+  en:
+    quickstart_title: "Meta-Questions · Single File"
+    staged_title: "Section {n} · {title}"
+    report_step_title: "Final step · Produce the report"
+    skill_title: "Meta-Questions · Claude Code skill"
+    profile_title: "profile.md — my meta-questions file (template {version})"
+    how_to_use: "How to use"
+    your_role: "Your role"
+    probe_rules: "Probe rules (you must follow these)"
+    questions_heading: "The questions (in order, one at a time)"
+    section_questions: "Questions in this section"
+    segment_label: "Section {n} · {title} ({subtitle})"
+    theory_line: "{subtitle} ｜ grounded in: {anchor}"
+    evidence_needed: "Evidence needed"
+    probe_condition: "Probe condition"
+    report_heading: "Once every question is answered, output this report"
+    report_section: "Section {n} · {title}"
+    form_label: "Format"
+    content_label: "Content"
+    footer_instruction: "The report footer must read"
+    write_to_profile: "When this section is done, write into profile.md"
+    next_step: "When this section is answered, have the AI write the conclusion into `profile.md`, then open {nxt}"
+    next_segment: "section {n} (`{file}`)"
+    next_report: "the final report step (`{file}`)"
+    basics: "Basics"
+    changelog: "Changelog"
+    changelog_line: "- <the date you started> created (template {version})"
+    pending_suffix: " (to fill in)"
+    execution_steps: "How to run this"
+    profile_template_heading: "profile.md template"
+    report_step_intro: "All four sections are answered. This step turns `profile.md` into a report you can act on."
+    report_step_usage:
+      - "Open a fresh conversation."
+      - "Paste your whole `profile.md` in first."
+      - "Then paste this file."
+      - "Save what it produces as `report.md`."
+    report_step_role: "The `profile.md` you have been given is the complete evidence from this person's four sections. Use only what is in it. Do not add, do not embellish, do not invent resources or people they never mentioned. Anything marked 'insufficient evidence' stays marked that way in the report."
+    want_labels: {number: "a number", name: "a name", date: "a date", story: "a specific account", choice: "one of the given options"}
+    want_join: " / "
+    report_date_placeholder: "<today's date>"
