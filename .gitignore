@@ -1,0 +1,14 @@
+# 环境与凭证（本项目不需要任何凭证，这条是防御性的）
+.env
+.env.*
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# 用户自己的档案：这个仓是模板，不收任何人的 profile
+profile.md
+report.md
