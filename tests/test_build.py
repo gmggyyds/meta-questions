@@ -438,9 +438,9 @@ def test_landing_prompt_matches_quickstart_without_the_banner(built, src):
         body = (dist_dir(lang) / "quickstart.md").read_text(encoding="utf-8")
         stripped = body.replace(BANNER + "\n", "", 1).lstrip()
         assert BANNER not in stripped
-        # 内嵌的是 JSON 字面量，取其中一段特征句做锚点即可
-        probe = stripped.splitlines()[0]
-        assert json_escaped(probe) in landing, f"落地页里的 {lang} 提示词与 quickstart 不一致"
+        # 必须比对**全文**。只查第一行是假绿灯：内容被截断后第一行仍在，照样过。
+        assert json_escaped(stripped) in landing, \
+            f"落地页里的 {lang} 提示词与 quickstart 不是同一份（长度 {len(stripped)}）"
     assert BANNER.replace('"', '\\"') not in landing, "落地页把 banner 一起复制给用户了"
 
 
