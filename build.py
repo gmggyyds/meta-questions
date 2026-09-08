@@ -499,7 +499,7 @@ def build_landing(src: dict) -> Path:
     html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>{src['landing']['zh']['hero']} · Meta-Questions</title>
+<title>{src['landing']['zh']['hero']} · {src['landing']['en']['hero']}</title>
 <meta name="description" content="{src['landing']['zh']['tagline']}">
 <style>{LANDING_CSS}</style></head><body>
 <div class="top"><button id="lang">EN</button></div>
@@ -514,7 +514,7 @@ def build_landing(src: dict) -> Path:
   <p class="note" id="privacy"></p>
   <p class="note" style="border:0;padding-top:6px;font-size:12px">{file_footer(src)}</p>
   <p class="links">
-    <a href="examples/sample_report.md" id="peek"></a>
+    <a href="{viewer}?sample=1" id="peek"></a>
     <a href="{viewer}" id="viewer"></a>
     <a href="{repo}" id="more"></a>
   </p>
@@ -536,7 +536,7 @@ function paint(){{
     g.qs.map(q => '<div class="qi"><b>Q' + q.n + '</b><span>' + q.x + '</span></div>').join('')).join('');
   $('privacy').textContent = d.privacy;
   $('peek').textContent = d.peek; $('viewer').textContent = d.viewer; $('more').textContent = d.more;
-  document.title = d.hero + ' · Meta-Questions';
+  // 标题不跟随语言：跟随会在英文下变成 "Meta-Questions · Meta-Questions"
 }}
 $('lang').onclick = () => {{ lang = lang === 'zh' ? 'en' : 'zh'; paint(); }};
 $('copy').onclick = async () => {{

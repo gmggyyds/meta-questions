@@ -188,6 +188,15 @@ $('theme').onclick = () => {
 };
 $('src').addEventListener('input', e => { $('out').innerHTML = render(e.target.value); });
 applyLang();
+
+/* ?sample=1 预载示例报告。file:// 下 fetch 会被拦，静默忽略即可——
+   这个页面的主用途是粘贴自己的报告，示例只是锦上添花。 */
+if (new URLSearchParams(location.search).has('sample')){
+  fetch('examples/sample_report.md')
+    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+    .then(md => { $('src').value = md; $('out').innerHTML = render(md); })
+    .catch(() => {});
+}
 </script>
 </body>
 </html>
