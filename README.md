@@ -5,6 +5,7 @@
 > *Answer these before you ask AI anything.*
 
 **v0.2.0** ｜ <!--COUNT:questions-->12<!--/COUNT--> 个问题 · 4 段 · 三档取用
+｜ [English](README.en.md)
 
 AI 时代真正的稀缺不是提示词技巧，是知道自己手上有什么。这套元问题不教你怎么用 Agent，它逼你先说清楚：你的优势、你的资源、你认识谁，以及在这三样之上，AI 到底该被用在哪个杠杆点上。
 
@@ -23,10 +24,10 @@ AI 时代真正的稀缺不是提示词技巧，是知道自己手上有什么�
 
 | # | 段 | 关注 | 题数 | 理论根 |
 |---|---|---|---|---|
-| 1 | 我是谁 / Who I Am | 个人最大优势 | 3 | Effectuation — Who I am |
-| 2 | 我手里有什么 / What I Hold | 现有资源 · VRIO | 3 | RBV / VRIO — Barney |
-| 3 | 我认识谁 / Whom I Know | 身边的资源 · 弱关系 | 3 | Granovetter — weak ties |
-| 4 | 杠杆在哪 / Where the Leverage Is | AI 时代最大杠杆 | 3 | Naval — four leverages + CRV Swap Test |
+| 1 | 我是谁 | 个人最大优势 | 3 | Effectuation — Who I am |
+| 2 | 我手里有什么 | 现有资源 · VRIO | 3 | RBV / VRIO — Barney |
+| 3 | 我认识谁 | 身边的资源 · 弱关系 | 3 | Granovetter — weak ties |
+| 4 | 杠杆在哪 | AI 时代最大杠杆 | 3 | Naval — four leverages + CRV Swap Test |
 
 ## 三档取用
 
@@ -38,10 +39,9 @@ AI 时代真正的稀缺不是提示词技巧，是知道自己手上有什么�
 
 ### 最快的用法
 
-```bash
-git clone <this repo> && cd meta-questions
-```
 复制 [`dist/quickstart.md`](dist/quickstart.md) 全文 → 粘进 ChatGPT / Claude / Coze / 豆包 → 发送 → 老实回答。
+
+先看看跑完长什么样：[`examples/sample_report.md`](examples/sample_report.md)。
 
 ## 你会拿到什么
 
@@ -56,14 +56,14 @@ git clone <this repo> && cd meta-questions
 
 | 维度 | 理论 | 出处 | 链接 |
 |---|---|---|---|
-| 三维模型整体 | Effectuation — Bird-in-Hand Principle: Who I am / What I know / Whom I know | Saras D. Sarasvathy, UVA Darden | [链接](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1278404) |
-| 个人最大优势 | Who I am — tastes, abilities, expertise | Sarasvathy, Effectuation | [链接](https://www.darden.virginia.edu/effectuation) |
-| 手里的现有资源 | RBV / VRIO — Valuable, Rare, Inimitable, Organized | Jay Barney, 1991 / 1995 | [链接](https://strategicmanagementinsight.com/tools/vrio/) |
-| 身边的资源 | The Strength of Weak Ties — 56% of people found jobs via contacts they saw only occasionally | Mark Granovetter, 1973, AJS | [链接](https://news.stanford.edu/stories/2023/07/strength-weak-ties) |
-| AI 时代最大杠杆 | Four kinds of leverage — labour, capital, code, media. The last two are permissionless. | Naval Ravikant | [链接](https://aydoo.services/en/articles/naval-ravikant-leverage/) |
-| AI Native vs 旧业务+AI | The Swap Test — remove the AI: does the team slow down (enabled) or does the model collapse (native)? | CRV, The Founder's Guide to AI-Native, 2026 | [链接](https://www.crv.com/content/what-is-ai-native) |
-| 元问题方法本身 | Meta-prompting — ask the model what it needs to know, one question at a time, before it answers | Practitioner consensus | [链接](https://whitebeardstrategies.com/blog/ask-ai-what-to-ask-ai-the-meta-prompting-advantage/) |
-| 验收判据 | 元问题 = 能引起问题的问题；判据是答完之后你自己冒出了新问题 | 教育学定义 | [链接](https://zhuanlan.zhihu.com/p/629895268) |
+| 三维模型整体 | Effectuation — Bird-in-Hand Principle: Who I am / What I know / Whom I know | Saras D. Sarasvathy, UVA Darden | [link](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1278404) |
+| 个人最大优势 | Who I am — tastes, abilities, expertise | Sarasvathy, Effectuation | [link](https://www.darden.virginia.edu/effectuation) |
+| 手里的现有资源 | RBV / VRIO — Valuable, Rare, Inimitable, Organized | Jay Barney, 1991 / 1995 | [link](https://strategicmanagementinsight.com/tools/vrio/) |
+| 身边的资源 | The Strength of Weak Ties — 56% of people found jobs via contacts they saw only occasionally | Mark Granovetter, 1973, AJS | [link](https://news.stanford.edu/stories/2023/07/strength-weak-ties) |
+| AI 时代最大杠杆 | Four kinds of leverage — labour, capital, code, media. The last two are permissionless. | Naval Ravikant | [link](https://aydoo.services/en/articles/naval-ravikant-leverage/) |
+| AI Native vs 旧业务+AI | The Swap Test — remove the AI: does the team slow down (enabled) or does the model collapse (native)? | CRV, The Founder's Guide to AI-Native, 2026 | [link](https://www.crv.com/content/what-is-ai-native) |
+| 元问题方法本身 | Meta-prompting — ask the model what it needs to know, one question at a time, before it answers | Practitioner consensus | [link](https://whitebeardstrategies.com/blog/ask-ai-what-to-ask-ai-the-meta-prompting-advantage/) |
+| 验收判据 | 元问题 = 能引起问题的问题；判据是答完之后你自己冒出了新问题 | 教育学定义 | [link](https://zhuanlan.zhihu.com/p/629895268) |
 
 ## 改它
 
@@ -71,15 +71,11 @@ git clone <this repo> && cd meta-questions
 
 ```bash
 pip install -r requirements.txt
-
-# 改完真源后重生成
-python3 build.py
-
-# 跑测试
+python3 build.py            # 改完真源后重生成
 python3 -m pytest tests/ -q
 ```
 
-`dist/`、`README.md`、`.claude/skills/` 全是生成物，**手改会被下次 build 抹掉**，
+`dist/`、`README*.md`、`.claude/skills/` 全是生成物，**手改会被下次 build 抹掉**，
 CI 也会因为 `git diff` 不干净而失败。
 
 ## 一个提醒
