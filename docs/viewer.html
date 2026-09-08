@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>元问题 · 报告排版器 / Meta-Questions Report Viewer</title>
+<style>
+  :root{
+    --bg:#faf9f7; --panel:#fff; --ink:#1c1a17; --muted:#6b6560; --line:#e6e1da;
+    --accent:#b4532a; --accent-soft:#f5ece6; --code:#f4f1ec;
+    --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+            "Microsoft YaHei", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17150f; --panel:#201d17; --ink:#ece7df; --muted:#a09a90; --line:#332e26;
+      --accent:#e08a5c; --accent-soft:#2b241d; --code:#262119;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17150f; --panel:#201d17; --ink:#ece7df; --muted:#a09a90; --line:#332e26;
+    --accent:#e08a5c; --accent-soft:#2b241d; --code:#262119;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+       font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+         padding:12px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  header h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.01em}
+  header .sp{flex:1}
+  button{font:inherit;font-size:13px;padding:7px 14px;border-radius:8px;cursor:pointer;
+         border:1px solid var(--line);background:var(--panel);color:var(--ink);transition:.15s}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{opacity:.88;color:#fff}
+  main{max-width:940px;margin:0 auto;padding:24px 20px 80px}
+  .hint{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  textarea{width:100%;min-height:230px;padding:16px;border-radius:12px;border:1px solid var(--line);
+           background:var(--panel);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+           font-size:13px;line-height:1.6;resize:vertical}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  #out{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+       padding:40px 44px;margin-top:22px}
+  #out:empty{display:none}
+  #out h1{font-size:27px;margin:.2em 0 .6em;letter-spacing:-.01em}
+  #out h2{font-size:20px;margin:1.9em 0 .5em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+  #out h3{font-size:16.5px;margin:1.7em 0 .4em;color:var(--accent)}
+  #out p{margin:.75em 0}
+  #out ul,#out ol{margin:.7em 0;padding-left:1.5em}
+  #out li{margin:.3em 0}
+  #out blockquote{margin:1em 0;padding:.6em 1.1em;border-left:3px solid var(--accent);
+                  background:var(--accent-soft);border-radius:0 8px 8px 0;color:var(--ink)}
+  #out blockquote p{margin:.25em 0}
+  #out table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:14.5px;display:block;overflow-x:auto}
+  #out th,#out td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+  #out th{background:var(--accent-soft);font-weight:640}
+  #out code{background:var(--code);padding:2px 6px;border-radius:5px;font-size:.88em;
+            font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #out pre{background:var(--code);padding:14px 16px;border-radius:10px;overflow-x:auto}
+  #out pre code{background:none;padding:0}
+  #out hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+  #out a{color:var(--accent)}
+  #out .url{display:block;font-size:12.5px;color:var(--muted);word-break:break-all}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:34px;text-align:center}
+  .warn{background:var(--accent-soft);border:1px solid var(--line);border-radius:10px;
+        padding:12px 16px;font-size:13.5px;color:var(--muted);margin:0 0 18px}
+  @media print{
+    header,#src,.hint,.warn,.noprint{display:none!important}
+    body{background:#fff;color:#000;font-size:11.5pt}
+    main{max-width:none;padding:0}
+    #out{border:0;padding:0;background:#fff}
+    #out h2{page-break-after:avoid} #out h3{page-break-after:avoid}
+    #out table,#out blockquote{page-break-inside:avoid}
+    #out a{color:#000;text-decoration:none}
+    #out .url{color:#444}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="t-title">元问题 · 报告排版器</h1>
+  <span class="sp"></span>
+  <button id="lang">EN</button>
+  <button id="theme">◐</button>
+  <button id="print" class="primary">打印 / 存 PDF</button>
+</header>
+<main>
+  <p class="warn" id="t-privacy">
+    这个页面完全在你的浏览器里运行：不联网、不上传、不保存。关掉就没了。
+    你的答案和报告不会离开这台电脑。
+  </p>
+  <p class="hint" id="t-hint">把 AI 生成的报告 Markdown 粘进下面，右边会实时排版。想存档就按「打印 / 存 PDF」。</p>
+  <textarea id="src" spellcheck="false"></textarea>
+  <div id="out"></div>
+  <p class="foot noprint" id="t-foot">meta-questions · 报告排版器 · 无后端 · 无存储</p>
+</main>
+<script>
+/* 极简 Markdown 渲染器。故意不引 CDN：
+   ① 现场 wifi 不可靠，必须离线可用；② 不引第三方脚本就没有供应链面。 */
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function inline(s){
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    // 网址同时可见：报告要能打印、能存纯文本，藏在 href 里的会丢
+    '<a href="$2" target="_blank" rel="noopener">$1</a><span class="url">$2</span>');
+  s = s.replace(/(^|[\s(（])(https?:\/\/[^\s)）]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  s = s.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+  return s;
+}
+function render(md){
+  const lines = md.replace(/\r\n?/g, '\n').split('\n');
+  const out = []; let i = 0;
+  const isRow = l => /^\s*\|.*\|\s*$/.test(l);
+  const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+  while (i < lines.length){
+    const l = lines[i];
+    if (/^```/.test(l)){
+      const buf = []; i++;
+      while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+      i++; out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>'); continue;
+    }
+    if (isRow(l) && isRow(lines[i+1] || '') && /^[\s|:-]+$/.test(lines[i+1])){
+      const head = cells(l); i += 2; const body = [];
+      while (i < lines.length && isRow(lines[i])) body.push(cells(lines[i++]));
+      out.push('<table><thead><tr>' + head.map(c => '<th>' + inline(c) + '</th>').join('') +
+        '</tr></thead><tbody>' + body.map(r => '<tr>' + r.map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>').join('') +
+        '</tbody></table>'); continue;
+    }
+    let m;
+    if ((m = l.match(/^(#{1,6})\s+(.*)$/))){
+      const n = Math.min(m[1].length, 6); out.push(`<h${n}>` + inline(m[2]) + `</h${n}>`); i++; continue;
+    }
+    if (/^\s*([-*_])\s*\1\s*\1[\s-*_]*$/.test(l)){ out.push('<hr>'); i++; continue; }
+    if (/^\s*>/.test(l)){
+      const buf = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) buf.push(lines[i++].replace(/^\s*>\s?/, ''));
+      out.push('<blockquote>' + render(buf.join('\n')) + '</blockquote>'); continue;
+    }
+    if (/^\s*([-*+]|\d+[.)])\s+/.test(l)){
+      const ordered = /^\s*\d+[.)]\s+/.test(l); const items = [];
+      while (i < lines.length && /^\s*([-*+]|\d+[.)])\s+/.test(lines[i]))
+        items.push(lines[i++].replace(/^\s*([-*+]|\d+[.)])\s+/, ''));
+      const tag = ordered ? 'ol' : 'ul';
+      out.push(`<${tag}>` + items.map(t => '<li>' + inline(t) + '</li>').join('') + `</${tag}>`); continue;
+    }
+    if (!l.trim()){ i++; continue; }
+    const buf = [];
+    while (i < lines.length && lines[i].trim() && !/^(#{1,6}\s|\s*>|\s*([-*+]|\d+[.)])\s|```)/.test(lines[i]) && !isRow(lines[i]))
+      buf.push(lines[i++]);
+    out.push('<p>' + inline(buf.join(' ')) + '</p>');
+  }
+  return out.join('\n');
+}
+
+const I18N = {
+  zh: { title:'元问题 · 报告排版器', print:'打印 / 存 PDF', lang:'EN',
+        privacy:'这个页面完全在你的浏览器里运行：不联网、不上传、不保存。关掉就没了。你的答案和报告不会离开这台电脑。',
+        hint:'把 AI 生成的报告 Markdown 粘进下面，下方会实时排版。想存档就按「打印 / 存 PDF」。',
+        foot:'meta-questions · 报告排版器 · 无后端 · 无存储',
+        ph:'# 第 1 节 · 你的画像\n\n把 AI 生成的报告粘到这里…' },
+  en: { title:'Meta-Questions · Report Viewer', print:'Print / Save PDF', lang:'中文',
+        privacy:'This page runs entirely in your browser: no network, no upload, nothing stored. Close the tab and it is gone. Your answers never leave this machine.',
+        hint:'Paste the Markdown report your AI produced below. It renders live underneath. Use Print / Save PDF to keep a copy.',
+        foot:'meta-questions · report viewer · no backend · no storage',
+        ph:'# Section 1 · Who you are\n\nPaste the report your AI produced here…' }
+};
+let lang = (navigator.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+const $ = id => document.getElementById(id);
+function applyLang(){
+  const d = I18N[lang];
+  document.documentElement.lang = lang;
+  $('t-title').textContent = d.title; $('print').textContent = d.print; $('lang').textContent = d.lang;
+  $('t-privacy').textContent = d.privacy; $('t-hint').textContent = d.hint;
+  $('t-foot').textContent = d.foot; $('src').placeholder = d.ph;
+  document.title = d.title;
+}
+$('lang').onclick = () => { lang = lang === 'zh' ? 'en' : 'zh'; applyLang(); };
+$('print').onclick = () => window.print();
+$('theme').onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : cur === 'light' ? '' : 'dark';
+  if (next) document.documentElement.setAttribute('data-theme', next);
+  else document.documentElement.removeAttribute('data-theme');
+};
+$('src').addEventListener('input', e => { $('out').innerHTML = render(e.target.value); });
+applyLang();
+</script>
+</body>
+</html>

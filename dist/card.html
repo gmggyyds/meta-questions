@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>元问题 · 现场卡 v0.2.0</title>
+<style>
+  @page { size: A5; margin: 0; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;
+       background:#eee;color:#1c1a17;-webkit-font-smoothing:antialiased}
+  .page{width:148mm;height:210mm;padding:13mm 12mm;background:#faf8f5;position:relative;
+        display:flex;flex-direction:column;page-break-after:always;overflow:hidden}
+  .page.back{background:#1c1a17;color:#f4efe8}
+  h1{font-size:26pt;letter-spacing:.06em;font-weight:800;line-height:1}
+  .tag{font-size:10.5pt;color:#8a7f74;margin-top:3.5mm;line-height:1.55}
+  .rule{height:2px;background:#b4532a;width:16mm;margin:5mm 0 4mm}
+  .sec{margin-bottom:3.2mm}
+  .sec h2{font-size:9pt;color:#b4532a;letter-spacing:.1em;font-weight:700;margin-bottom:1.4mm}
+  .q{display:flex;gap:2mm;font-size:8.4pt;line-height:1.42;margin-bottom:1.1mm}
+  .q b{color:#b4532a;font-weight:700;flex:0 0 6.5mm;font-variant-numeric:tabular-nums}
+  .note{margin-top:auto;font-size:8.5pt;color:#8a7f74;border-top:1px solid #e3ddd4;padding-top:3mm}
+  .back h1{font-size:17pt;color:#f4efe8}
+  .back ol{margin:5mm 0 0 5mm;font-size:9.5pt;line-height:1.62}
+  .back li{margin-bottom:2.6mm}
+  .back code{background:#2e2820;padding:.5mm 1.4mm;border-radius:1mm;font-size:8.6pt}
+  .hl{margin-top:6mm;border:1px solid #b4532a;border-radius:2mm;padding:4mm}
+  .hl .lab{font-size:7.5pt;letter-spacing:.14em;color:#e08a5c;font-weight:700}
+  .hl .q10{font-size:10.5pt;line-height:1.5;margin-top:2mm}
+  .qr{margin-top:auto;display:flex;gap:5mm;align-items:flex-end;padding-top:5mm}
+  .qr svg{width:30mm;height:30mm;background:#faf8f5;padding:1.6mm;border-radius:1.5mm;flex:0 0 auto}
+  .qrtxt{font-size:8pt;line-height:1.55;color:#a8a096}
+  .qrtxt .u{font-family:ui-monospace,Menlo,monospace;font-size:7.2pt;color:#e08a5c;word-break:break-all}
+  @media screen{ body{padding:16px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+                 .page{box-shadow:0 3px 20px rgba(0,0,0,.18);border-radius:3px} }
+</style></head><body>
+<div class="page front">
+  <h1>元问题</h1>
+  <div class="tag">在你问 AI 任何问题之前，先回答这些问题。</div>
+  <div class="rule"></div>
+  <div class="sec"><h2>1. 我是谁 · 个人最大优势</h2><div class="q"><b>Q1</b><span>过去三年，有没有一件事，别人做要花 3 倍的时间或成本，你却做成了？说出具体的时间、金额和结果。</span></div><div class="q"><b>Q2</b><span>你身上有没有一个别人觉得「你怎么会这个」的技能或经历？它当初是怎么来的？</span></div><div class="q"><b>Q3</b><span>有没有一类问题，大家习惯性来找你问？最近一次是谁、问的什么？</span></div></div><div class="sec"><h2>2. 我手里有什么 · 现有资源 · VRIO</h2><div class="q"><b>Q4</b><span>列 3 样你已经花过钱、花过时间攒下来的东西（数据、库存、内容、账号、供应链关系、代码、现金流……），每样给一个数字。</span></div><div class="q"><b>Q5</b><span>这 3 样里，哪一样是别人花钱也短期买不到的？为什么买不到？</span></div><div class="q"><b>Q6</b><span>这 3 样里，哪一样现在基本躺着没用？躺了多久？为什么没用起来？</span></div></div><div class="sec"><h2>3. 我认识谁 · 身边的资源 · 弱关系</h2><div class="q"><b>Q7</b><span>谁能替你开一扇你自己敲不开的门？写出那扇门具体是什么。</span></div><div class="q"><b>Q8</b><span>谁能在 24 小时内给你一个诚实的「这东西行不行」的判断？他为什么会诚实？</span></div><div class="q"><b>Q9</b><span>谁手上有流量或名单，而且他有理由帮你分发？他的理由是什么？（「关系好」不算理由）</span></div></div><div class="sec"><h2>4. 杠杆在哪 · AI 时代最大杠杆</h2><div class="q"><b>Q10</b><span>Swap Test：把 AI 从你现在做的这件事里完全拔掉，你是「变慢」，还是「整个模式垮掉」？只能二选一。</span></div><div class="q"><b>Q11</b><span>如果 AI 明天免费、无限、且不会出错，你现在做的这件事应该长什么样？它会不会根本不该是现在这个形态？</span></div><div class="q"><b>Q12</b><span>你现在缺的是哪一种杠杆——劳动力、资本、代码、还是媒体？你过去为什么没拿到它？AI 能不能绕过那个原因？</span></div></div>
+  <div class="note">答完这 12 题，「该问 AI 什么」自己就浮出来了。</div>
+</div>
+<div class="page back">
+  <h1>怎么用</h1>
+  <ol><li>扫码打开落地页，点「复制提示词」——一下就进剪贴板。</li><li>粘进 ChatGPT / Claude / Coze / 豆包，任意一个都行。</li><li>它会一次问你一题。老实答——报告的质量完全取决于你答得有多具体。</li><li>12 题答完，它给你一份 8 节的报告：你的不公平优势、躺着没用的资源、AI Native 判定、下周能开始的三个动作。</li></ol>
+  <div class="hl">
+    <div class="lab">全场唯一的二选一</div>
+    <div class="q10">Q10　Swap Test：把 AI 从你现在做的这件事里完全拔掉，你是「变慢」，还是「整个模式垮掉」？只能二选一。</div>
+  </div>
+  <div class="qr">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37"><path fill="#faf8f5" d="M0 0h37v37h-37z"/><path class="qrline" stroke="#1c1a17" d="M4 4.5h7m2 0h1m4 0h1m1 0h1m1 0h3m1 0h7m-29 1h1m5 0h1m4 0h1m2 0h5m1 0h1m1 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h3m7 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m1 0h8m1 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h4m2 0h5m1 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m1 0h5m2 0h3m4 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h1m1 0h1m3 0h3m1 0h1m-19 1h1m1 0h5m2 0h3m1 0h3m1 0h1m1 0h1m2 0h5m-27 1h2m1 0h3m2 0h1m2 0h3m2 0h5m1 0h3m3 0h1m-27 1h2m1 0h3m1 0h1m1 0h6m1 0h1m2 0h3m-23 1h1m1 0h3m3 0h4m1 0h3m3 0h1m2 0h3m1 0h1m-28 1h1m1 0h1m2 0h3m1 0h2m1 0h6m2 0h1m4 0h2m-27 1h1m1 0h3m2 0h5m1 0h1m2 0h5m1 0h3m3 0h1m-26 1h1m2 0h2m4 0h6m2 0h4m1 0h2m-25 1h1m4 0h1m3 0h2m2 0h1m7 0h2m2 0h1m-27 1h2m1 0h4m2 0h1m2 0h7m5 0h2m-27 1h1m1 0h3m3 0h1m5 0h1m1 0h9m1 0h1m1 0h1m-29 1h1m3 0h1m1 0h1m1 0h3m1 0h2m1 0h3m2 0h1m2 0h2m1 0h1m-27 1h1m1 0h4m2 0h4m2 0h3m2 0h3m1 0h1m3 0h1m-28 1h1m4 0h2m1 0h1m2 0h1m1 0h1m3 0h1m2 0h5m1 0h3m-21 1h3m2 0h1m3 0h2m1 0h1m3 0h5m-29 1h7m3 0h7m2 0h2m1 0h1m1 0h3m-27 1h1m5 0h1m1 0h2m2 0h1m1 0h2m3 0h2m3 0h1m2 0h2m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h5m1 0h3m-29 1h1m1 0h3m1 0h1m1 0h1m3 0h2m2 0h1m1 0h1m1 0h1m4 0h4m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h2m3 0h2m1 0h6m-28 1h1m5 0h1m2 0h4m2 0h2m3 0h2m1 0h1m1 0h1m1 0h1m-28 1h7m1 0h1m1 0h1m1 0h2m1 0h3m4 0h3m1 0h1"/></svg>
+
+    <div class="qrtxt">跑在你自己的 AI 账号里。我们不收你任何数据，也收不到。<br><span class="u">https://gmggyyds.github.io/meta-questions/</span><br>
+      开源 · MIT · 扫码即用<br><span style="font-size:6.5pt">generated by meta-questions v0.2.0 · 2026-09-09</span></div>
+  </div>
+</div>
+</body></html>
