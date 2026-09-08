@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      # 生成物必须与真源同步。手改 dist/ 或改了真源忘了跑 build，都会在这里挂。
+      # 这一条同时顶了「防手改」和「防忘 build」两件事——比本地 pre-commit hook 硬，
+      # 因为 fork 的贡献者不会安装本地 hook。
+      - name: 重新生成，检查是否有差异
+        run: |
+          python3 build.py
+          git diff --exit-code -- dist README.md .claude/skills \
+            || { echo "::error::生成物与 source/meta_questions.yaml 不同步。改真源后请跑 python3 build.py 并提交结果。"; exit 1; }
+
+      - run: python3 -m pytest tests/ -q
