@@ -472,3 +472,22 @@ def test_landing_and_card_have_no_external_dependencies(built):
         text = p.read_text(encoding="utf-8")
         for host in ("cdn.", "unpkg", "jsdelivr", "googleapis"):
             assert host not in text, f"{p.name} 引了外部资源: {host}"
+
+
+def test_no_ambiguous_bold_next_to_cjk_punctuation(built, src):
+    """CommonMark 的强调分隔符规则：`**` 两侧都是标点时既能开也能闭，
+    解析器会错配，GitHub 上渲染成字面量的 `**`。
+
+    实际踩到过：`最后一节叫**「你还没回答的问题」**——这是……`
+    整段两行的加粗全部失效，`**` 原样显示。CJK 场景下这类相邻很常见，
+    所以用 <b></b> 而不是 `**`。
+    """
+    punct = "「」『』（）《》，。、；：？！—…·\u201c\u201d\u2018\u2019"
+    pattern = re.compile(f"[{re.escape(punct)}]\\*\\*[{re.escape(punct)}]")
+    for lang in LANGS:
+        text = readme_path(lang).read_text(encoding="utf-8")
+        hit = pattern.search(text)
+        assert not hit, (
+            f"README({lang}) 里 `**` 两侧都是标点，GitHub 会渲染成字面量："
+            f"…{text[max(0, hit.start()-25):hit.end()+25]}… → 改用 <b></b>"
+        )
