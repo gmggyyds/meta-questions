@@ -450,3 +450,60 @@ ui:
     want_labels: {number: "a number", name: "a name", date: "a date", story: "a specific account", choice: "one of the given options"}
     want_join: " / "
     report_date_placeholder: "<today's date>"
+
+# ── 对外链接（卡片二维码 / README 都从这里取，别写死两处）──────
+links:
+  repo: "https://github.com/gmggyyds/meta-questions"
+  # 二维码指向这里，不指仓库根目录：现场大多数人用手机，
+  # 在 GitHub 移动端点进 dist/ → 点文件 → 点 Raw → 全选复制，大部分人会在这步流失
+  pages: "https://gmggyyds.github.io/meta-questions/"
+
+# ── 现场实体卡（A5 双面，印刷用）────────────────────────────
+card:
+  size: "A5"
+  front_title: "元问题"
+  front_tagline: "在你问 AI 任何问题之前，先回答这些问题。"
+  front_note: "答完这 12 题，「该问 AI 什么」自己就浮出来了。"
+  back_title: "怎么用"
+  back_steps:
+    - "扫码打开落地页，点「复制提示词」——一下就进剪贴板。"
+    - "粘进 ChatGPT / Claude / Coze / 豆包，任意一个都行。"
+    - "它会一次问你一题。老实答——报告的质量完全取决于你答得有多具体。"
+    - "12 题答完，它给你一份 8 节的报告：你的不公平优势、躺着没用的资源、AI Native 判定、下周能开始的三个动作。"
+  back_highlight_label: "全场唯一的二选一"
+  back_highlight_q: 10
+  back_privacy: "跑在你自己的 AI 账号里。我们不收你任何数据，也收不到。"
+  back_footer: "开源 · MIT · 扫码即用"
+
+# ── GitHub Pages 落地页（二维码的落点）──────────────────────
+landing:
+  zh:
+    hero: "元问题"
+    tagline: "在你问 AI 任何问题之前，先回答这些问题。"
+    copy_btn: "复制提示词"
+    copied: "已复制 ✓ 去粘给 AI"
+    steps_title: "三步"
+    steps:
+      - "点上面的按钮，提示词进你的剪贴板"
+      - "粘进 ChatGPT / Claude / Coze / 豆包，发送"
+      - "它一次问你一题，答完给你一份 8 节的报告"
+    peek: "先看看跑完长什么样"
+    questions_title: "12 个问题"
+    privacy: "全程跑在你自己的 AI 账号里。这个页面不联网、不上传、不保存任何东西。"
+    more: "开源仓库"
+    viewer: "报告排版器"
+  en:
+    hero: "Meta-Questions"
+    tagline: "Answer these before you ask AI anything."
+    copy_btn: "Copy the prompt"
+    copied: "Copied ✓ now paste it into your AI"
+    steps_title: "Three steps"
+    steps:
+      - "Tap the button — the prompt goes to your clipboard"
+      - "Paste it into ChatGPT / Claude / any AI chat and send"
+      - "It asks one question at a time, then gives you an 8-section report"
+    peek: "See what a finished report looks like"
+    questions_title: "The 12 questions"
+    privacy: "Everything runs in your own AI account. This page makes no network calls, uploads nothing, stores nothing."
+    more: "Source repository"
+    viewer: "Report viewer"

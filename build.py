@@ -18,6 +18,7 @@
 """
 from __future__ import annotations
 
+import json
 import re
 import shutil
 from pathlib import Path
@@ -443,6 +444,224 @@ def build_stage_script(src: dict) -> Path:
     return write(DIST / "stage_script.md", "\n".join(out + [f"<sub>{file_footer(src)}</sub>"]))
 
 
+# ── GitHub Pages 落地页（二维码的落点）──────────────────────
+LANDING_CSS = """
+  :root{--bg:#faf8f5;--card:#fff;--ink:#1c1a17;--muted:#7d746a;--line:#e8e2d9;--accent:#b4532a;--soft:#f5ece6}
+  @media(prefers-color-scheme:dark){:root{--bg:#16140f;--card:#201d17;--ink:#ece7df;--muted:#9c948a;--line:#332e26;--accent:#e08a5c;--soft:#2b241d}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-size:17px;line-height:1.7;
+       font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Roboto,sans-serif;
+       -webkit-font-smoothing:antialiased;padding:0 0 64px}
+  .wrap{max-width:640px;margin:0 auto;padding:0 20px}
+  .top{display:flex;justify-content:flex-end;padding:14px 20px 0;max-width:640px;margin:0 auto}
+  .top button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;
+              padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+  h1{font-size:40px;letter-spacing:.04em;margin:26px 0 10px;font-weight:800}
+  .tag{color:var(--muted);font-size:17px;margin-bottom:26px}
+  .cta{display:block;width:100%;padding:19px;border:0;border-radius:14px;background:var(--accent);
+       color:#fff;font:inherit;font-size:19px;font-weight:700;cursor:pointer;transition:.15s}
+  .cta:active{transform:scale(.985)}
+  .cta.ok{background:#2f7d4f}
+  h2{font-size:14px;letter-spacing:.12em;color:var(--accent);margin:36px 0 12px;font-weight:700}
+  ol{margin-left:20px} ol li{margin:8px 0}
+  .qs{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .grp{font-size:13px;letter-spacing:.08em;color:var(--accent);font-weight:700;margin:16px 0 7px}
+  .grp:first-child{margin-top:0}
+  .qi{display:flex;gap:9px;font-size:15px;line-height:1.6;margin:6px 0;color:var(--ink)}
+  .qi b{color:var(--accent);flex:0 0 30px;font-variant-numeric:tabular-nums}
+  .note{color:var(--muted);font-size:14px;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+  .links{margin-top:14px;font-size:14px;display:flex;gap:18px;flex-wrap:wrap}
+  a{color:var(--accent)}
+"""
+
+
+def build_landing(src: dict) -> Path:
+    """二维码落在这里，不落仓库根目录：现场大多数人用手机。"""
+    quickstart = (DIST / "quickstart.md").read_text(encoding="utf-8")
+    payload = {
+        lang: {
+            **src["landing"][lang],
+            # 剥掉 banner：那句「生成物，勿手改」是给贡献者看的，
+            # 用户粘进 ChatGPT 第一行就读到它，纯噪音
+            "prompt": (dist_dir(lang) / "quickstart.md")
+                      .read_text(encoding="utf-8").replace(BANNER + "\n", "", 1).lstrip(),
+            "groups": [
+                {"t": f"{s['n']}. {tr(s, 'title', lang)} · {tr(s, 'subtitle', lang)}",
+                 "qs": [{"n": qnum(q), "x": q["zh"] if lang == "zh" else q["en"]}
+                        for q in s["questions"]]}
+                for s in segments(src)
+            ],
+        }
+        for lang in LANGS
+    }
+    data = json.dumps(payload, ensure_ascii=False)
+    repo, viewer = src["links"]["repo"], "viewer.html"
+    html = f"""<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{src['landing']['zh']['hero']} · Meta-Questions</title>
+<meta name="description" content="{src['landing']['zh']['tagline']}">
+<style>{LANDING_CSS}</style></head><body>
+<div class="top"><button id="lang">EN</button></div>
+<div class="wrap">
+  <h1 id="hero"></h1>
+  <p class="tag" id="tag"></p>
+  <button class="cta" id="copy"></button>
+  <h2 id="stepsTitle"></h2>
+  <ol id="steps"></ol>
+  <h2 id="qsTitle"></h2>
+  <div class="qs" id="qs"></div>
+  <p class="note" id="privacy"></p>
+  <p class="note" style="border:0;padding-top:6px;font-size:12px">{file_footer(src)}</p>
+  <p class="links">
+    <a href="examples/sample_report.md" id="peek"></a>
+    <a href="{viewer}" id="viewer"></a>
+    <a href="{repo}" id="more"></a>
+  </p>
+</div>
+<script>
+const D = {data};
+let lang = (navigator.language||'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+const $ = i => document.getElementById(i);
+function paint(){{
+  const d = D[lang];
+  document.documentElement.lang = lang;
+  $('lang').textContent = lang === 'zh' ? 'EN' : '中文';
+  $('hero').textContent = d.hero; $('tag').textContent = d.tagline;
+  $('copy').textContent = d.copy_btn; $('copy').classList.remove('ok');
+  $('stepsTitle').textContent = d.steps_title;
+  $('steps').innerHTML = d.steps.map(s => '<li>' + s + '</li>').join('');
+  $('qsTitle').textContent = d.questions_title;
+  $('qs').innerHTML = d.groups.map(g => '<div class="grp">' + g.t + '</div>' +
+    g.qs.map(q => '<div class="qi"><b>Q' + q.n + '</b><span>' + q.x + '</span></div>').join('')).join('');
+  $('privacy').textContent = d.privacy;
+  $('peek').textContent = d.peek; $('viewer').textContent = d.viewer; $('more').textContent = d.more;
+  document.title = d.hero + ' · Meta-Questions';
+}}
+$('lang').onclick = () => {{ lang = lang === 'zh' ? 'en' : 'zh'; paint(); }};
+$('copy').onclick = async () => {{
+  const text = D[lang].prompt;
+  try {{ await navigator.clipboard.writeText(text); }}
+  catch (e) {{
+    // iOS Safari / 非安全上下文的兜底：临时 textarea + execCommand
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  }}
+  $('copy').textContent = D[lang].copied; $('copy').classList.add('ok');
+  setTimeout(() => {{ $('copy').textContent = D[lang].copy_btn; $('copy').classList.remove('ok'); }}, 2600);
+}};
+paint();
+</script></body></html>
+"""
+    # viewer 一并复制进 docs/：手工 cp 的副本必然漂移（lesson 2026-08-06）
+    (ROOT / "docs").mkdir(exist_ok=True)
+    shutil.copyfile(ROOT / "viewer" / "index.html", ROOT / "docs" / "viewer.html")
+    (ROOT / "docs" / "examples").mkdir(exist_ok=True)
+    shutil.copyfile(ROOT / "examples" / "sample_report.md",
+                    ROOT / "docs" / "examples" / "sample_report.md")
+    _ = quickstart
+    return write(ROOT / "docs" / "index.html", html)
+
+
+# ── 现场实体卡（A5 双面，印刷用）────────────────────────────
+CARD_CSS = """
+  @page { size: A5; margin: 0; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,sans-serif;
+       background:#eee;color:#1c1a17;-webkit-font-smoothing:antialiased}
+  .page{width:148mm;height:210mm;padding:13mm 12mm;background:#faf8f5;position:relative;
+        display:flex;flex-direction:column;page-break-after:always;overflow:hidden}
+  .page.back{background:#1c1a17;color:#f4efe8}
+  h1{font-size:26pt;letter-spacing:.06em;font-weight:800;line-height:1}
+  .tag{font-size:10.5pt;color:#8a7f74;margin-top:3.5mm;line-height:1.55}
+  .rule{height:2px;background:#b4532a;width:16mm;margin:5mm 0 4mm}
+  .sec{margin-bottom:3.2mm}
+  .sec h2{font-size:9pt;color:#b4532a;letter-spacing:.1em;font-weight:700;margin-bottom:1.4mm}
+  .q{display:flex;gap:2mm;font-size:8.4pt;line-height:1.42;margin-bottom:1.1mm}
+  .q b{color:#b4532a;font-weight:700;flex:0 0 6.5mm;font-variant-numeric:tabular-nums}
+  .note{margin-top:auto;font-size:8.5pt;color:#8a7f74;border-top:1px solid #e3ddd4;padding-top:3mm}
+  .back h1{font-size:17pt;color:#f4efe8}
+  .back ol{margin:5mm 0 0 5mm;font-size:9.5pt;line-height:1.62}
+  .back li{margin-bottom:2.6mm}
+  .back code{background:#2e2820;padding:.5mm 1.4mm;border-radius:1mm;font-size:8.6pt}
+  .hl{margin-top:6mm;border:1px solid #b4532a;border-radius:2mm;padding:4mm}
+  .hl .lab{font-size:7.5pt;letter-spacing:.14em;color:#e08a5c;font-weight:700}
+  .hl .q10{font-size:10.5pt;line-height:1.5;margin-top:2mm}
+  .qr{margin-top:auto;display:flex;gap:5mm;align-items:flex-end;padding-top:5mm}
+  .qr svg{width:30mm;height:30mm;background:#faf8f5;padding:1.6mm;border-radius:1.5mm;flex:0 0 auto}
+  .qrtxt{font-size:8pt;line-height:1.55;color:#a8a096}
+  .qrtxt .u{font-family:ui-monospace,Menlo,monospace;font-size:7.2pt;color:#e08a5c;word-break:break-all}
+  @media screen{ body{padding:16px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+                 .page{box-shadow:0 3px 20px rgba(0,0,0,.18);border-radius:3px} }
+"""
+
+
+def _qr_svg(url: str) -> str:
+    """二维码。缺 segno 直接炸，不降级。
+
+    降级成占位框有两个害处：① 装没装 segno 会产出不同的 card.html，破坏幂等，
+    「dist 与真源同步」的 CI 守卫直接失效；② 占位框可能被当成成品拿去印刷。
+    """
+    import io
+
+    try:
+        import segno
+    except ImportError as e:
+        raise SourceError(
+            "生成现场卡需要 segno（二维码）。跑 `pip install -r requirements.txt`。"
+            "这里不做降级：占位二维码印出来就是废卡。"
+        ) from e
+    buf = io.BytesIO()   # segno 的 svg writer 写的是 bytes，不是 str
+    segno.make(url, error="m").save(buf, kind="svg", svgclass=None, omitsize=True,
+                                    xmldecl=False, svgns=True, dark="#1c1a17", light="#faf8f5")
+    return buf.getvalue().decode("utf-8")
+
+
+def build_card(src: dict) -> Path:
+    c, segs = src["card"], segments(src)
+    url = src["links"]["pages"]   # 落地页，不是仓库根目录
+    front_secs = "".join(
+        '<div class="sec"><h2>' + f"{s['n']}. {s['title_zh']} · {s['subtitle_zh']}" + "</h2>"
+        + "".join(f'<div class="q"><b>Q{qnum(q)}</b><span>{q["zh"]}</span></div>'
+                  for q in s["questions"])
+        + "</div>"
+        for s in segs
+    )
+    steps = "".join(
+        "<li>" + re.sub(r"`([^`]+)`", r"<code>\1</code>", st) + "</li>" for st in c["back_steps"]
+    )
+    q10 = next(q for s in segs for q in s["questions"] if qnum(q) == c["back_highlight_q"])
+    html = f"""<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>{c['front_title']} · 现场卡 v{src['version']}</title>
+<style>{CARD_CSS}</style></head><body>
+<div class="page front">
+  <h1>{c['front_title']}</h1>
+  <div class="tag">{c['front_tagline']}</div>
+  <div class="rule"></div>
+  {front_secs}
+  <div class="note">{c['front_note']}</div>
+</div>
+<div class="page back">
+  <h1>{c['back_title']}</h1>
+  <ol>{steps}</ol>
+  <div class="hl">
+    <div class="lab">{c['back_highlight_label']}</div>
+    <div class="q10">Q{qnum(q10)}　{q10['zh']}</div>
+  </div>
+  <div class="qr">
+    {_qr_svg(url)}
+    <div class="qrtxt">{c['back_privacy']}<br><span class="u">{url}</span><br>
+      {c['back_footer']}<br><span style="font-size:6.5pt">{file_footer(src)}</span></div>
+  </div>
+</div>
+</body></html>
+"""
+    return write(DIST / "card.html", html)
+
+
 # ── README ─────────────────────────────────────────────────
 README_ZH = """{banner}
 # {name} · 元问题
@@ -648,6 +867,8 @@ def main() -> None:
         made.append(build_skill(src, lang))
         made.append(build_readme(src, lang))
     made.append(build_stage_script(src))
+    made.append(build_landing(src))
+    made.append(build_card(src))
     print(f"built {src['name']} v{src['version']} ({src['released_on']}) → {len(made)} files")
     for p in made:
         print(f"  {p.relative_to(ROOT)}")

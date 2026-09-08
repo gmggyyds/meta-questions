@@ -21,7 +21,7 @@ jobs:
       - name: 重新生成，检查是否有差异
         run: |
           python3 build.py
-          git diff --exit-code -- dist README.md .claude/skills \
+          git diff --exit-code -- dist docs README.md README.en.md .claude/skills \
             || { echo "::error::生成物与 source/meta_questions.yaml 不同步。改真源后请跑 python3 build.py 并提交结果。"; exit 1; }
 
       - run: python3 -m pytest tests/ -q

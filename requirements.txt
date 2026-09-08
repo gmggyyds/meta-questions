@@ -1,3 +1,4 @@
 # build.py 只需要 pyyaml；pytest 仅测试期用
 pyyaml>=6.0
+segno>=1.6      # 现场卡的二维码，纯 Python 零依赖
 pytest>=8.0
