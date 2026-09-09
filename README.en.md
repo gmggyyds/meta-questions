@@ -114,6 +114,15 @@ It is judged by whether **you walked away with new questions of your own**.
 - **Q11**　If AI were free, infinite and never wrong tomorrow — what should this thing look like? Should it even exist in its current shape?
 - **Q12**　Which leverage are you missing — labour, capital, code, or media? Why did you not get it before? Can AI route around that reason?
 
+## And after you answer them?
+
+The report sits in a chat window, and in two weeks you will not find it again.
+Open a new conversation and the model knows nothing about you all over again.
+
+**[the-great-me](https://github.com/gmggyyds/the-great-me)** turns those answers into a ledger on your own machine:
+notes, meeting minutes and tickets keep filing themselves into the twelve slots, and your
+AI reads it before it judges anything. The data never leaves your machine.
+
 ## Three ways to use it
 
 | Tier | What | For whom | Remembers you |

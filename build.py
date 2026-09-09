@@ -496,6 +496,7 @@ def build_landing(src: dict) -> Path:
     }
     data = json.dumps(payload, ensure_ascii=False)
     repo, viewer = src["links"]["repo"], "viewer.html"
+    sequel = src["links"]["sequel"]
     html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -511,6 +512,9 @@ def build_landing(src: dict) -> Path:
   <ol id="steps"></ol>
   <h2 id="qsTitle"></h2>
   <div class="qs" id="qs"></div>
+  <h2 id="sequelTitle"></h2>
+  <p id="sequelBody" style="color:var(--muted)"></p>
+  <p><a id="sequelLink" href="{sequel}"></a></p>
   <p class="note" id="privacy"></p>
   <p class="note" style="border:0;padding-top:6px;font-size:12px">{file_footer(src)}</p>
   <p class="links">
@@ -534,6 +538,9 @@ function paint(){{
   $('qsTitle').textContent = d.questions_title;
   $('qs').innerHTML = d.groups.map(g => '<div class="grp">' + g.t + '</div>' +
     g.qs.map(q => '<div class="qi"><b>Q' + q.n + '</b><span>' + q.x + '</span></div>').join('')).join('');
+  $('sequelTitle').textContent = d.sequel_title;
+  $('sequelBody').textContent = d.sequel_body;
+  $('sequelLink').textContent = d.sequel_link;
   $('privacy').textContent = d.privacy;
   $('peek').textContent = d.peek; $('viewer').textContent = d.viewer; $('more').textContent = d.more;
   // 标题不跟随语言：跟随会在英文下变成 "Meta-Questions · Meta-Questions"
@@ -748,6 +755,13 @@ AI ▸ 你身上有没有一个别人觉得「你怎么会这个」的技能或�
 
 {q_list}
 
+## 答完之后呢
+
+报告躺在某个对话窗口里，两周后你自己都找不到。下次开新对话，AI 又完全不认识你。
+
+**[the-great-me]({sequel})** 把这些答案变成一份存在你自己电脑上的账本：
+以后的笔记、会议纪要、工单标个题号就持续归位，AI 做判断前先读它。数据不离开你的机器。
+
 ## 三档取用
 
 | 档 | 用什么 | 给谁 | 记得住你吗 |
@@ -945,6 +959,15 @@ It is judged by whether **you walked away with new questions of your own**.
 
 {q_list}
 
+## And after you answer them?
+
+The report sits in a chat window, and in two weeks you will not find it again.
+Open a new conversation and the model knows nothing about you all over again.
+
+**[the-great-me]({sequel})** turns those answers into a ledger on your own machine:
+notes, meeting minutes and tickets keep filing themselves into the twelve slots, and your
+AI reads it before it judges anything. The data never leaves your machine.
+
 ## Three ways to use it
 
 | Tier | What | For whom | Remembers you |
@@ -1071,6 +1094,7 @@ def build_readme(src: dict, lang: str) -> Path:
     return write(readme_path(lang), tmpl.format(
         banner=BANNER + "\n", name=src["name"], version=src["version"],
         repo=src["links"]["repo"], pages=src["links"]["pages"],
+        sequel=src["links"]["sequel"],
         tagline_zh=src["tagline_zh"], tagline_en=src["tagline_en"],
         qcount=sum(len(s["questions"]) for s in src["segments"]),
         nseg=len(src["segments"]), nsec=len(secs),

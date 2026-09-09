@@ -457,6 +457,8 @@ links:
   # 二维码指向这里，不指仓库根目录：现场大多数人用手机，
   # 在 GitHub 移动端点进 dist/ → 点文件 → 点 Raw → 全选复制，大部分人会在这步流失
   pages: "https://gmggyyds.github.io/meta-questions/"
+  # 续作：答完 12 题之后，让答案常驻并跟着你长
+  sequel: "https://github.com/gmggyyds/the-great-me"
 
 # ── 现场实体卡（A5 双面，印刷用）────────────────────────────
 card:
@@ -492,6 +494,9 @@ landing:
     privacy: "全程跑在你自己的 AI 账号里。这个页面不联网、不上传、不保存任何东西。"
     more: "开源仓库"
     viewer: "报告排版器"
+    sequel_title: "答完之后呢？"
+    sequel_body: "报告躺在对话窗口里，两周后你自己都找不到。the-great-me 把这些答案变成一份存在你自己电脑上的账本——以后的笔记持续归位，AI 做判断前先读它。数据不离开你的机器。"
+    sequel_link: "the-great-me · 让它跟着你长"
   en:
     hero: "Meta-Questions"
     tagline: "Answer these before you ask AI anything."
@@ -507,3 +512,6 @@ landing:
     privacy: "Everything runs in your own AI account. This page makes no network calls, uploads nothing, stores nothing."
     more: "Source repository"
     viewer: "Report viewer"
+    sequel_title: "And after you answer them?"
+    sequel_body: "The report sits in a chat window and you will not find it again in two weeks. the-great-me turns these answers into a ledger on your own machine — new notes keep filing themselves into the twelve slots, and your AI reads it before it judges anything. The data never leaves your machine."
+    sequel_link: "the-great-me · make it grow with you"
