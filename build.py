@@ -921,7 +921,7 @@ requirements.txt             构建依赖三个：pyyaml、segno、pytest
 不是模型不够强。是它不认识你——不知道你手里有什么、你的判断是怎么下的、
 你到底在哪一步反复拖累了它。
 
-下面四个，每一个拆的都是你身上的一处卡点。
+下面几个，每一个拆的都是你身上的一处卡点。
 
 | | 你卡在哪 | 它做什么 |
 |---|---|---|
@@ -929,6 +929,7 @@ requirements.txt             构建依赖三个：pyyaml、segno、pytest
 | <b>[the-great-me]({sequel})</b><br><sub>更伟大的自己</sub> | 每开一次新对话，AI 都从零重新认识你一遍 | 把你的判断沉成常驻画像，让每次沟通都比上一次更懂你一点 |
 | <b>[xxoo](https://github.com/gmggyyds/xxoo)</b><br><sub>吸星大法</sub> | 你抄的那套方法论，是给<b>别人的</b>生意写的 | 逐环拿你的业务去对，把别人的化成你自己的 |
 | <b>[agents-deep-insights](https://github.com/gmggyyds/agents-deep-insights)</b><br><sub>会话照妖镜</sub> | 你以为是 AI 不行，其实是你在同一个地方反复绊住它 | 扫出你到底在哪拖累了它 |
+| <b>[sam-taste](https://github.com/gmggyyds/sam-taste)</b><br><sub>什么样才算做好了</sub> | 每次都要重新说一遍「什么样才算好」，说完就散了 | 把判断标准写死，AI 照着跑 |
 
 连起来是一条线：
 
@@ -939,7 +940,10 @@ requirements.txt             构建依赖三个：pyyaml、segno、pytest
 明镜   回头看我到底卡在哪            agents-deep-insights
 ```
 
-<b>适合自己的，才有无限可能。</b> 这四个没有一个是给你标准答案的——
+`sam-taste` 不在这条线上——它横切在每一环之上：**这几个东西本身，
+都是按它的标准做出来的。**
+
+<b>适合自己的，才有无限可能。</b> 这些没有一个是给你标准答案的——
 它们只干一件事：<b>让 AI 从「认识人类」变成「认识你」。</b>
 
 ## 🏁 说到底
